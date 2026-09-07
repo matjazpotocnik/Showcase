@@ -1,145 +1,85 @@
 # ProcessShowcase
 
-A boilerplate / reference module for building **backend administrative
-interfaces** in ProcessWire. It does nothing useful on its own — its sole
-purpose is to demonstrate, in one place, the patterns you will reach for
-when writing your own admin Process modules.
+ProcessShowcase is a demonstration module for the ProcessWire admin. It brings
+common admin interface elements together in one place so you can see how they
+look, how they behave and how they respond to your admin theme.
 
-## Install
+The module is useful when you are:
 
-Requirements:
+- building or testing a ProcessWire admin theme;
+- checking how controls behave in light and dark mode;
+- comparing different form fields and page selectors;
+- testing files, images, repeaters, tables, lists, cards and dialogs;
+- looking for a working example before building your own admin page.
 
-- ProcessWire 3.0.270 or newer.
-- PHP 8.0.0 or newer.
+It is a reference and testing tool. It does not add features to the public side
+of your website.
 
-1. Copy the `ProcessShowcase/` directory to `site/modules/`.
-2. In the ProcessWire admin go to **Modules > Refresh**.
-3. Click **Install** next to "Showcase".
-4. Navigate to **Setup > Showcase**.
+![Showcase dashboard](screenshot-processshowcase-module.png)
 
-The module installs a single admin page at `setup/showcase/` and registers
-twelve child subpages via `useNavJSON` + `nav`. It declares one PHP class,
-owns focused field/template/page fixtures for native Repeater and media tests.
+## Requirements
 
-![Showcase dashboard screenshot](screenshot-processshowcase-module.png)
+- ProcessWire 3 or newer
+- PHP 8 or newer
+- Superuser access to the ProcessWire admin
 
-## What it demonstrates
+## Installation
 
-### File: `ProcessShowcase.module.php`
+1. Copy the `ProcessShowcase` folder into `site/modules/`.
+2. In the ProcessWire admin, go to **Modules > Refresh**.
+3. Find **Showcase** and click **Install**.
+4. Open **Setup > Showcase**.
 
-| Pattern                                            | Implementation                                                                   |
-| -------------------------------------------------- | -------------------------------------------------------------------------------- |
-| **Module configuration page**                      | `getModuleConfigInputfields()`                                                   |
-| **Admin landing page**                             | `___execute()`                                                                   |
-| **Custom subpages with menu entries**              | `nav` + `useNavJSON` in `getModuleInfo()` and matching `___executeXxx()` methods |
-| **Dashboard layout**                               | Stat cards + quick-action card grid in `___execute()`                            |
-| **Basic numeric, date and utility Inputfields**    | `___executeForms()`                                                              |
-| **Selection controls**                             | `___executeSelectionControls()`                                                  |
-| **Native file and image management**               | `___executeFilesImages()`                                                        |
-| **Text Inputfields and rich-text editors**         | `___executeText()`                                                               |
-| **Checkboxes, radios and toggles**                 | `___executeChoices()`                                                            |
-| **Buttons, button-group, submit + dropdown menu**  | `___executeActions()`                                                            |
-| **Dynamic repeater (add / remove / drag-reorder)** | `___executeRepeater()`                                                           |
-| **Data tables (`MarkupAdminDataTable` and UIkit)** | `___executeTables()`                                                             |
-| **Description / item / nav lists**                 | `___executeLists()`                                                              |
-| **Card-grid layouts**                              | `___executeCards()`                                                              |
-| **PageList state and action contracts**             | `___executePagelist()`                                                           |
-| **Notices, alerts, confirms and iframe modals**     | `___executeFeedback()`                                                           |
+The module creates the admin page and the private test data needed by some of
+its examples.
 
-### Subpages
+## How to use it
 
-| URL                        | Method                 | What you'll see                                                                                                                                                                                                                                                                                                                         |
-| -------------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `setup/showcase/`          | `___execute()`         | Stat cards, quick-action tiles, live config summary                                                                                                                                                                                                                                                                                     |
-| `setup/showcase/forms/`    | `___executeForms()`    | Integer, float, date-only, time-only and date-time controls; hidden and markup utilities |
-| `setup/showcase/selection-controls/` | `___executeSelectionControls()` | Select, SelectMultiple, AsmSelect, PageListSelect, PageListSelectMultiple, Icon picker and Selector builder controls |
-| `setup/showcase/page-references/` | `___executePageReferences()` | Every core `InputfieldPage` delegate: Select, Radios, SelectMultiple, Checkboxes, AsmSelect, PageListSelect, PageListSelectMultiple, PageAutocomplete and TextTags, using real existing pages |
-| `setup/showcase/files-images/` | `___executeFilesImages()` | Genuine `InputfieldFile` and `InputfieldImage` fields with seeded files and images for testing their native controls |
-| `setup/showcase/text/`     | `___executeText()`     | Text-family Inputfields, language tabs, CKEditor, TinyMCE and optional InputfieldJson, with a textarea fallback when neither rich-text editor is installed |
-| `setup/showcase/choices/`  | `___executeChoices()`  | `InputfieldCheckbox`, `InputfieldCheckboxes`, `InputfieldRadios`, and `InputfieldToggle`, with documented setup and processed scalar/array value contracts |
-| `setup/showcase/actions/`  | `___executeActions()`  | `InputfieldSubmit` and `InputfieldButton` hierarchy, an enhanced submit action menu, `InputfieldToggle` segmented control, grouped navigation links, and a standalone form submit |
-| `setup/showcase/repeater/` | `___executeRepeater()` | Dynamic repeater: add new rows, remove individual rows, drag-to-reorder via jQuery UI `.sortable()`, with the row count capped by the module's `maxItems` config                                                                                                                                                                        |
-| `setup/showcase/tables/`   | `___executeTables()`   | `MarkupAdminDataTable` with sortable columns, status labels, per-row action button group + a striped UIkit table                                                                                                                                                                                                                        |
-| `setup/showcase/lists/`    | `___executeLists()`    | `uk-description-list`, `uk-list` with badges, `uk-nav`                                                                                                                                                                                                                                                                                  |
-| `setup/showcase/cards/`    | `___executeCards()`    | Responsive `uk-card` grid with header / body / footer + action buttons                                                                                                                                                                                                                                                                  |
-| `setup/showcase/pagelist/` | `___executePagelist()` | Representative open, hidden, unpublished, locked, loading and placeholder PageList states |
-| `setup/showcase/feedback/` | `___executeFeedback()` | ProcessWire message, warning and error notices; alert and confirm helpers; and an iframe modal                                                                                                                                                                                                                                           |
+Open **Setup > Showcase**. The dashboard links to focused pages for different
+parts of the ProcessWire admin interface.
 
-The Page references subpage does not create fixture pages. Each `InputfieldPage`
-uses a small selector over existing pages, and remains non-AJAX-collapsed because
-an AJAX-collapsed `InputfieldPage` intentionally defers delegate configuration.
+- **Basic inputs** shows number, date, time and utility fields.
+- **Selection controls** shows selects, page selectors and related controls.
+- **Page references** compares the available ways to choose existing pages.
+- **Text & editors** shows text fields, language tabs and rich-text editors.
+- **Checkboxes, radios & toggles** lets you compare choice controls.
+- **Buttons & action menus** shows buttons, grouped actions and dropdowns.
+- **Files & images** provides real upload, description, sorting and image tools.
+- **Repeaters** lets you add, remove and reorder rows.
+- **Tables, Lists and Cards** show common ways to present admin content.
+- **HTML elements** provides a broad set of standard elements for theme testing.
+- **PageList states** shows common page statuses and actions.
+- **Notices & dialogs** demonstrates messages, confirmations and modals.
 
-## Key APIs referenced
+You can freely interact with the examples. Most form submissions simply show
+the submitted values and do not permanently store them.
 
-- **`Process`** base class — `___execute()`, `___executeXxx()`, `$this->headline()`, `$this->breadcrumb()`, `$this->browserTitle()`
-- **`ConfigurableModule`** — `getModuleConfigInputfields(InputfieldWrapper $inputfields)`
-- **`InputfieldForm`** — `processInput()`, `getValueByName()`, magic `$form->Inputfield…` shortcuts
-- **`InputfieldSubmit`** — `addActionValue($value, $label, $icon)` for the dropdown action menu, `showInHeader(true)` for header-pinned submit
-- **`InputfieldButton`** — `setSecondary()`, `href`, `icon`
-- **`InputfieldText` and specializations** — length/count behavior plus Email, URL, Password, PageName, PageTitle and Name validation/sanitization contracts
-- **`InputfieldTextarea`** — multi-line text and the base contract used by rich-text editors
-- **`InputfieldPage`** — delegates page selection to Select, Radios, SelectMultiple, Checkboxes, AsmSelect, PageListSelect, PageListSelectMultiple, PageAutocomplete or TextTags
-- **`InputfieldCKEditor` and `InputfieldTinyMCE`** — rich-text rendering and standalone form processing
-- **`InputfieldCheckbox`** — `checked()` controls state independently from `checkedValue` and `uncheckedValue`
-- **`InputfieldCheckboxes`** — multiple selected options are processed as an array value
-- **`InputfieldRadios`** — one selected option is processed as a scalar string value
-- **`InputfieldToggle`** — named constants and label types define its binary or optional third state
-- **`InputfieldFile` and `InputfieldImage`** — genuine Page-bound AJAX uploads, metadata, sorting, deletion and image editing
-- **`ProcessShowcase::getTestPage()`** — supplies the module-owned disposable saved Page required by native file and image fields
-- **`MarkupAdminDataTable`** — `setSortable()`, `setEncodeEntities(false)`, `headerRow()`, `row()`
-- **`InputfieldMarkup`** + raw HTML rows + jQuery UI `.sortable()` — the recipe used for the dynamic repeater
-- **Advanced Inputfields** — AsmSelect and LanguageTabs
-- **ProcessWire UI contracts** — PageList states/actions, file-list states, notices and modal helpers
-- **`Modules::getConfig` / `Modules::saveConfig`** — persisting module settings
+## Saved test data
 
-## File and image lifecycle
+The Repeater and Files & images pages are different: ProcessWire needs saved
+pages and fields for these controls to work normally. ProcessShowcase creates
+its own private test records for them.
 
-The Files & images subpage intentionally uses real ProcessWire persistence.
-Native file/image AJAX handling, image variations, crop and focus tools require
-a saved Page with genuine FieldtypeFile and FieldtypeImage fields; standalone
-Inputfields cannot demonstrate the complete behavior.
+Files, images, descriptions, ordering and repeater items are kept when you save
+their forms, so you can reload the page and continue testing. This data belongs
+only to ProcessShowcase and is not connected to your website content.
 
-- ProcessShowcase creates and owns the hidden `showcase-media-fixture`
-  page and template. Its `getTestPage()` method mirrors the essential saved-page
-  behavior previously supplied by WireTests without requiring that module.
-- It does not reuse the core `wire_test_file` and `wire_test_image` fields.
-  Their automated tests deliberately delete and replace all values, so sharing
-  them would erase showcase uploads and make the tests interfere with this page.
-- When each media field is first created, the module copies its default examples
-  from `assets/demo/` into the page's normal files directory. It does this only
-  once, so a default file or image that you delete does not return after a page
-  refresh. The original demo files remain in the module for a future reinstall.
-- The document field holds at most four files: three default examples plus one
-  upload. The image field holds at most three images: two defaults plus one
-  upload. Deleting an item frees a place for another upload.
-- An AJAX upload is temporary until **Save** is submitted. After
-  that save, uploaded files/images, descriptions, ordering, focus data and image
-  variations persist on the ProcessShowcase media page across reloads.
-- Deleting an item in the Inputfield and saving removes that stored item using
-  ProcessWire's normal Pagefiles/Pageimages lifecycle.
-- Uninstalling ProcessShowcase deletes every stored item in its two media fields,
-  including user uploads and generated image variations, then deletes the media
-  page, template and fields. Reinstalling recreates the complete fixture and
-  copies in the default demo assets.
+## Configuration
 
-## Safe by design
+Open the **Showcase** module in **Modules** to change its example settings,
+including the maximum number of repeater items. These settings exist only to
+demonstrate a module configuration screen.
 
-- Restricted to superusers in `init()`.
-- Most standalone form submissions are echoed back and not persisted.
-- The native Repeater and file/image examples use explicitly named disposable
-  fixtures because those Inputfields require real ProcessWire persistence.
-- Uninstalling removes the admin page automatically (handled by the `page` key
-  in `getModuleInfo()`), removes the Repeater fixture, and performs the media
-  cleanup described above.
+## Uninstallation
 
-## Prompt
+Uninstall **Showcase** from the ProcessWire module screen when you no longer
+need it. Uninstallation removes the Showcase admin page and all private test
+data created by the module, including uploaded files, images and generated image
+variations.
 
-Write a complete ProcessWire module designed exclusively as a boilerplate reference for building backend administrative interfaces. Please provide the necessary PHP code and file structure to demonstrate how to implement module configuration pages, custom admin subpages with dedicated menu entries, and dashboard-style layouts. The module must include practical examples of forms utilizing all available ProcessWire input field types, specifically focusing on repeater fields, dropdowns, button groups, and buttons with dropdown menus for executing multiple actions. Additionally, incorporate examples of rendering data using tables, lists, and card layouts within the ProcessWire admin UI.
+Do not store anything important in the Showcase examples.
 
+## Technical reference
 
-### HTML elements
-
-The **HTML elements** dashboard card opens `setup/showcase/html-elements/`,
-rendering the local upstream HTML5 Test Page body directly inside a UIkit card.
-See [fixture update instructions](fixtures/html5-test-page/README.md).
-The upstream HTML is unchanged on disk; its image URLs remain remote.
+Implementation details for developers and coding agents are kept in
+[DEVELOPMENT.md](DEVELOPMENT.md).
