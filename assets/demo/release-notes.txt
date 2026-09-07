@@ -1,0 +1,3 @@
+ProcessShowcase release notes
+
+This sample document demonstrates native ProcessWire file uploads, descriptions, tags, sorting, and deletion.
