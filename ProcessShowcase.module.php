@@ -64,6 +64,7 @@ class ProcessShowcase extends Process implements ConfigurableModule
 			'summary' => 'Boilerplate / reference module that showcases ProcessWire admin UI patterns.',
 			'version' => 2,
 			'author' => 'webmanufaktur, Matjaž Potočnik, AI',
+			'href' => 'https://github.com/matjazpotocnik/Showcase',
 			'icon' => 'flask',
 			'autoload' => false,
 			'singular' => true,
@@ -149,6 +150,7 @@ class ProcessShowcase extends Process implements ConfigurableModule
 			$fieldgroup = $template->fieldgroup;
 			if (!$fieldgroup instanceof Fieldgroup) return;
 			$this->templates->_callHookMethod('delete', [$template]);
+			//$this->templates->delete($template);
 			$this->fieldgroups->delete($fieldgroup);
 		}
 		if ($textField) $this->fields->delete($textField);
@@ -1164,7 +1166,8 @@ class ProcessShowcase extends Process implements ConfigurableModule
 			$field = $this->requireModule(InputfieldCKEditor::class);
 			$field->attr('name', 'rich_ckeditor');
 			$field->label = $this->_('InputfieldCKEditor');
-			$field->description = $this->_('Extends InputfieldTextarea with CKEditor rich-text editing.');
+			$field->description = $this->_('Extends InputfieldTextarea with CKEditor rich-text editing, including the wordcount plugin.');
+			$field->extraPlugins = array_merge($field->extraPlugins, ['wordcount']);
 			$fieldset->add($field);
 		}
 
@@ -1172,7 +1175,8 @@ class ProcessShowcase extends Process implements ConfigurableModule
 			$field = $this->requireModule(InputfieldTinyMCE::class);
 			$field->attr('name', 'rich_tinymce');
 			$field->label = $this->_('InputfieldTinyMCE');
-			$field->description = $this->_('Extends InputfieldTextarea with TinyMCE rich-text editing.');
+			$field->description = $this->_('Extends InputfieldTextarea with TinyMCE rich-text editing, including the wordcount plugin.');
+			$field->plugins = 'anchor code link lists pwimage pwlink table wordcount';
 			$fieldset->add($field);
 		}
 
@@ -1890,6 +1894,8 @@ JS;
 			$inputfield->description = $fieldName === self::REPEATER_FIXTURE_FIELD
 				? $this->_('Native short, clipped, and icon labels. Hover the trash icon to preview deletion.')
 				: $this->_('Native custom label background. Hover the trash icon to verify its preview state.');
+			// This dynamically locks the repeater to its current number of items,
+			// preventing the user from adding or removing items.
 			$inputfield->set('repeaterMaxItems', is_countable($value) ? count($value) : 0);
 			$form->add($inputfield);
 		}
@@ -1981,10 +1987,9 @@ JS;
 
 		$template = $this->templates->get(self::REPEATER_FIXTURE_TEMPLATE);
 		if (!$template instanceof Template) {
-			// $template = $this->templates->new(self::REPEATER_FIXTURE_TEMPLATE, ['fields' => array_values($repeaterFields), 'noChildren' => 1, 'noParents' => 1]); // MP: save first so the template has a fieldgroup
 			$template = $this->templates->new(self::REPEATER_FIXTURE_TEMPLATE);
 			$template->noChildren = 1;
-			$template->noParents = 1;
+			$template->noParents = -1;
 			$template->save();
 		} elseif (!$template->fieldgroup) {
 			$template->save();
@@ -2336,7 +2341,11 @@ JS;
 
 		$html = file_get_contents(__DIR__ . '/fixtures/html5-test-page/index.html');
 		if ($html === false || !preg_match('~<body\b[^>]*>(.*)</body\s*>~is', $html, $matches)) {
-			throw new WireException('Unable to read the HTML5 test page body.');
+			throw new WireException(
+				$html === false
+					? $this->_('Unable to read the HTML5 test page fixture. Verify that site/modules/ProcessShowcase/fixtures/html5-test-page/index.html exists.')
+					: $this->_('HTML5 test page body not found in fixture file.')
+			);
 		}
 
 		// Preserve the upstream file; only extract its body and resolve local references.
@@ -2531,10 +2540,12 @@ JS;
 	 * @param mixed $value
 	 * @return string
 	 */
-	protected function formatSubmittedValue($value): string
+	protected function formatSubmittedValue(mixed $value): string
 	{
-		if (is_array($value)) {
-			return implode(', ', array_map([$this, 'formatSubmittedValue'], $value));
+		if (is_iterable($value)) {
+			$parts = [];
+			foreach ($value as $v) $parts[] = $this->formatSubmittedValue($v);
+			return implode(', ', $parts);
 		}
 		if ($value === null) return '';
 		if (is_bool($value)) return $value ? '1' : '0';
