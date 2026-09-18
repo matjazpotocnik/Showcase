@@ -48,11 +48,18 @@ class ProcessShowcase extends Process implements ConfigurableModule
 	protected const REPEATER_FIXTURE_TEXT_FIELD = 'showcase_repeater_text';
 	protected const REPEATER_FIXTURE_TEMPLATE = 'showcase-repeater-fixture';
 	protected const REPEATER_FIXTURE_PAGE = 'showcase-repeater-fixture';
+	protected const SELECTION_FIXTURE_TEMPLATE = 'showcase-selection-fixture';
+	protected const SELECTION_FIXTURE_UNPUBLISHED_PAGE = 'showcase-selection-spring-campaign';
+	protected const SELECTION_FIXTURE_HIDDEN_PAGE = 'showcase-selection-archived-campaign';
 	protected const MEDIA_FIXTURE_TEMPLATE = 'showcase-media-fixture';
 	protected const MEDIA_FIXTURE_PAGE = 'showcase-media-fixture';
 	protected const MEDIA_FIXTURE_FILE_FIELD = 'showcase_files';
 	protected const MEDIA_FIXTURE_IMAGE_FIELD = 'showcase_images';
 	protected const MEDIA_FIXTURE_INITIALIZED = 'showcaseDemoInitialized';
+	protected const COMMENTS_FIXTURE_TEMPLATE = 'showcase-comments-fixture';
+	protected const COMMENTS_FIXTURE_PAGE = 'showcase-comments-fixture';
+	protected const COMMENTS_FIXTURE_FIELD = 'showcase_comments';
+	protected const COMMENTS_FIXTURE_INITIALIZED = 'showcaseCommentsInitialized';
 
 	/**
 	 * @return array<string, mixed>
@@ -85,6 +92,7 @@ class ProcessShowcase extends Process implements ConfigurableModule
 				['url' => 'forms/',     'label' => 'Basic inputs',      'icon' => 'list-alt'],
 				['url' => 'selection-controls/', 'label' => 'Selection controls', 'icon' => 'list'],
 				['url' => 'files-images/', 'label' => 'Files & images',  'icon' => 'picture-o'],
+				['url' => 'comments/',   'label' => 'Comments',          'icon' => 'comments'],
 				['url' => 'repeater/',  'label' => 'Repeaters',    'icon' => 'clone'],
 				['url' => 'page-references/', 'label' => 'Page references', 'icon' => 'sitemap'],
 				['url' => 'tables/',    'label' => 'Tables',            'icon' => 'table'],
@@ -106,6 +114,8 @@ class ProcessShowcase extends Process implements ConfigurableModule
 	{
 		$this->ensureNativeRepeaterFixture();
 		$this->ensureNativeMediaFixture();
+		$this->ensureSelectionFixtures();
+		$this->ensureCommentsFixture();
 	}
 
 	/**
@@ -115,7 +125,9 @@ class ProcessShowcase extends Process implements ConfigurableModule
 	 */
 	public function ___uninstall()
 	{
+		$this->removeSelectionFixture();
 		$this->removeNativeMediaFixture();
+		$this->removeCommentsFixture();
 		$page = $this->pages->get('include=all, template=' . self::REPEATER_FIXTURE_TEMPLATE . ', name=' . self::REPEATER_FIXTURE_PAGE);
 		if ($page->id) $this->pages->delete($page, true);
 
@@ -214,7 +226,7 @@ class ProcessShowcase extends Process implements ConfigurableModule
 		$users   = $this->users;
 		$adminUrl = $this->page->url;
 
-		$this->headline($this->_('Showcase dashboard'));
+		$this->headline('Showcase dashboard');
 		$this->browserTitle($this->_('Showcase'));
 
 		// Live stats from the actual install — purely illustrative.
@@ -246,6 +258,7 @@ class ProcessShowcase extends Process implements ConfigurableModule
 			['url' => 'selection-controls/', 'icon' => 'list', 'label' => $this->_('Selection controls'), 'desc' => $this->_('Dropdowns, listboxes, ordered selections and visual pickers.')], // MP
 			['url' => 'page-references/', 'icon' => 'sitemap', 'label' => $this->_('Page references'), 'desc' => $this->_('Choose pages using dropdowns, lists, search, tags, or the page tree.')],
 			['url' => 'files-images/', 'icon' => 'picture-o', 'label' => $this->_('Files & images'), 'desc' => $this->_('File and image upload Inputfields, including rendered gallery states.')],
+			['url' => 'comments/', 'icon' => 'comments', 'label' => $this->_('Comments'), 'desc' => $this->_('Moderate featured, approved, pending and spam comments.')],
 			['url' => 'text/',     'icon' => 'font',       'label' => $this->_('Text & editors'), 'desc' => $this->_('Single-line, multi-line, sanitized and rich-text Inputfields.')],
 			['url' => 'choices/',  'icon' => 'check-square-o', 'label' => $this->_('Checkboxes, radios & toggles'), 'desc' => $this->_('Single and multiple choices with their submitted value contracts.')],
 			['url' => 'actions/',  'icon' => 'bolt',       'label' => $this->_('Buttons & action menus'), 'desc' => $this->_('Button hierarchy, grouped controls and submit buttons with dropdown actions.')],
@@ -322,14 +335,12 @@ class ProcessShowcase extends Process implements ConfigurableModule
 		$input   = $this->input;
 		$session = $this->session;
 
-		// $this->headline($this->_('Form fields')); // MP: renamed to distinguish this page from other Inputfield showcases
-		$this->headline($this->_('Basic inputs'));
+		$this->headline('Basic inputs');
 		$this->breadcrumb('../', $this->_('Showcase'));
 
 		$form = $this->requireModule(InputfieldForm::class);
 		$form->attr('method', 'post');
 		$form->attr('action', './');
-		// $form->description = $this->_('Numeric, date, selection and utility Inputfields.'); // MP: selection controls moved to their own page
 		$form->description = $this->_('Numeric, date and utility Inputfields.');
 
 		/* --- Numeric --- */
@@ -378,7 +389,7 @@ class ProcessShowcase extends Process implements ConfigurableModule
 		$f = $this->requireModule(InputfieldDatetime::class);
 		$f->attr('name', 'time');
 		$f->label = $this->_('Time only');
-		$f->description = $this->_('InputfieldDatetime with the native timepicker opened when the field receives focus.');
+		$f->description = $this->_('InputfieldDatetime timepicker opens on field focus.');
 		$f->datepicker = InputfieldDatetime::datepickerFocus;
 		$f->dateInputFormat = '';
 		$f->timeInputFormat = 'H:i';
@@ -396,7 +407,7 @@ class ProcessShowcase extends Process implements ConfigurableModule
 		$f->columnWidth = 34;
 		$fs->add($f);
 
-		/* MP: expose native ProcessWire and UIkit validation states for theme testing */
+		/* expose native ProcessWire and UIkit validation states for theme testing */
 
 		$fs = $this->requireModule(InputfieldFieldset::class);
 		$fs->label = $this->_('Validation state');
@@ -485,10 +496,13 @@ class ProcessShowcase extends Process implements ConfigurableModule
 		$modules = $this->modules;
 		$input = $this->input;
 		$session = $this->session;
-		$selectedPages = $this->pages->find('id>1, include=hidden, sort=id, limit=3');
+		$selectedPages = $this->pages->find('id>1, status<' . Page::statusHidden . ', sort=id, limit=2');
 		$singlePage = $selectedPages->first();
+		foreach ($this->ensureSelectionFixtures() as $fixturePage) {
+			$selectedPages->add($fixturePage);
+		}
 
-		$this->headline($this->_('Selection controls'));
+		$this->headline('Selection controls');
 		$this->breadcrumb('../', $this->_('Showcase'));
 
 		$form = $this->requireModule(InputfieldForm::class);
@@ -602,6 +616,86 @@ class ProcessShowcase extends Process implements ConfigurableModule
 		return $form->render();
 	}
 
+	/**
+	 * Get or create pages with non-default statuses used by selection controls.
+	 *
+	 * @return array<string, Page>
+	 */
+	protected function ensureSelectionFixtures(): array
+	{
+		$template = $this->templates->get(self::SELECTION_FIXTURE_TEMPLATE);
+		if (!$template instanceof Template) {
+			$template = $this->templates->new(self::SELECTION_FIXTURE_TEMPLATE);
+			$template->noChildren = 1;
+			$template->noParents = -1;
+			$template->save();
+		}
+
+		$fieldgroup = $template->fieldgroup;
+		$titleField = $this->fields->get('title');
+		if (!$fieldgroup instanceof Fieldgroup || !$titleField instanceof Field) return [];
+		if (!$fieldgroup->hasField($titleField)) {
+			$fieldgroup->add($titleField);
+			$fieldgroup->save();
+		}
+
+		$specs = [
+			'unpublished' => [
+				'name' => self::SELECTION_FIXTURE_UNPUBLISHED_PAGE,
+				'title' => $this->_('Spring campaign'),
+				'status' => Page::statusUnpublished,
+			],
+			'hidden' => [
+				'name' => self::SELECTION_FIXTURE_HIDDEN_PAGE,
+				'title' => $this->_('Archived campaign'),
+				'status' => Page::statusHidden,
+			],
+		];
+		$fixturePages = [];
+		foreach ($specs as $key => $spec) {
+			$page = $this->pages->get('include=all, template=' . self::SELECTION_FIXTURE_TEMPLATE . ', name=' . $spec['name']);
+			if (!$page->id) {
+				$page = $this->pages->new([
+					'template' => $template,
+					'parent' => 1,
+					'name' => $spec['name'],
+					'title' => $spec['title'],
+					'status' => $spec['status'],
+				]);
+			} else if ($page->title !== $spec['title'] || $page->status !== $spec['status']) {
+				$page->of(false);
+				$page->title = $spec['title'];
+				$page->status = $spec['status'];
+				$page->save();
+			}
+			$fixturePages[$key] = $page;
+		}
+		$fixtureNames = array_column($specs, 'name');
+		foreach ($this->pages->find('include=all, template=' . self::SELECTION_FIXTURE_TEMPLATE) as $page) {
+			if (!in_array($page->name, $fixtureNames, true)) $this->pages->delete($page, true);
+		}
+
+		return $fixturePages;
+	}
+
+	/**
+	 * Remove the selection-control fixture page and template.
+	 *
+	 * @return void
+	 */
+	protected function removeSelectionFixture(): void
+	{
+		$pages = $this->pages->find('include=all, template=' . self::SELECTION_FIXTURE_TEMPLATE);
+		foreach ($pages as $page) $this->pages->delete($page, true);
+
+		$template = $this->templates->get(self::SELECTION_FIXTURE_TEMPLATE);
+		if (!$template instanceof Template) return;
+		$fieldgroup = $template->fieldgroup;
+		if (!$fieldgroup instanceof Fieldgroup) return;
+		$this->templates->_callHookMethod('delete', [$template]);
+		$this->fieldgroups->delete($fieldgroup);
+	}
+
 	/* ---------------------------------------------------------------------
 	 * Page references
 	 * ------------------------------------------------------------------- */
@@ -616,10 +710,13 @@ class ProcessShowcase extends Process implements ConfigurableModule
 		$modules = $this->modules;
 		$pages = $this->pages;
 		$fields = $this->fields;
-		$selectedPages = $pages->find('id>1, include=hidden, sort=id, limit=3');
+		$selectedPages = $pages->find('id>1, status<' . Page::statusHidden . ', sort=id, limit=2');
+		foreach ($this->ensureSelectionFixtures() as $fixturePage) {
+			$selectedPages->add($fixturePage);
+		}
 		$singlePage = $selectedPages->first();
 
-		$this->headline($this->_('Page references'));
+		$this->headline('Page references');
 		$this->breadcrumb('../', $this->_('Showcase'));
 
 		$form = $this->requireModule(InputfieldForm::class);
@@ -643,8 +740,9 @@ class ProcessShowcase extends Process implements ConfigurableModule
 			$f->label = $label;
 			$f->description = $description;
 			$f->inputfield = $inputfield;
-			$f->findPagesSelector = 'id>1, include=hidden, sort=id, limit=12';
+			$f->findPagesSelector = 'id=' . $selectedPages . ', include=all, sort=id';
 			$f->labelFieldName = 'title';
+			$f->allowUnpub = 1;
 			$f->derefAsPage = 1;
 			if ($singlePage instanceof Page) $f->setAttribute('value', $singlePage);
 			$f->columnWidth = 33;
@@ -669,8 +767,9 @@ class ProcessShowcase extends Process implements ConfigurableModule
 			$f->label = $label;
 			$f->description = $description;
 			$f->inputfield = $inputfield;
-			$f->findPagesSelector = 'id>1, include=hidden, sort=id, limit=12';
+			$f->findPagesSelector = 'id=' . $selectedPages . ', include=all, sort=id';
 			$f->labelFieldName = 'title';
+			$f->allowUnpub = 1;
 			$f->setAttribute('value', $selectedPages);
 			$f->columnWidth = 50;
 			$multiple->add($f);
@@ -692,8 +791,9 @@ class ProcessShowcase extends Process implements ConfigurableModule
 			$f->label = $label;
 			$f->description = $description;
 			$f->inputfield = $inputfield;
-			$f->findPagesSelector = 'id>1, include=hidden, sort=id, limit=20';
+			$f->findPagesSelector = 'id>1, include=all, sort=id, limit=20';
 			$f->labelFieldName = 'title';
+			$f->allowUnpub = 1;
 			$f->set('maxSelectedItems', 0);
 			$f->setAttribute('value', $selectedPages);
 			$f->columnWidth = 50;
@@ -764,14 +864,13 @@ class ProcessShowcase extends Process implements ConfigurableModule
 		$input = $this->input;
 		$session = $this->session;
 
-		$this->headline($this->_('Files & images'));
+		$this->headline('Files & images');
 		$this->breadcrumb('../', $this->_('Showcase'));
 
 		$form = $this->requireModule(InputfieldForm::class);
 		$form->attr('method', 'post');
 		$form->attr('action', './');
 		$form->attr('enctype', 'multipart/form-data');
-		// $form->description = $this->_('File and image Inputfields backed by the disposable WireTests page.'); // MP: removed WireTests dependency
 		$form->description = $this->_('File and image Inputfields backed by a disposable ProcessShowcase page.');
 
 		$fieldset = $this->requireModule(InputfieldFieldset::class);
@@ -780,7 +879,6 @@ class ProcessShowcase extends Process implements ConfigurableModule
 		$form->add($fieldset);
 
 		$fixture = $this->ensureNativeMediaFixture();
-		// if (!$fixture) throw new WireException($this->_('Unable to prepare the WireTests media fixture.')); // MP: media fixture is now module-owned
 		if (!$fixture) throw new WireException($this->_('Unable to prepare the ProcessShowcase media fixture.'));
 		$fixturePage = $fixture['page'];
 		$fixturePage->of(false);
@@ -898,7 +996,6 @@ class ProcessShowcase extends Process implements ConfigurableModule
 		if (!$fileFieldtype instanceof FieldtypeFile || !$imageFieldtype instanceof FieldtypeImage) {
 			return null;
 		}
-		// $page = $wireTests->getTestPage(); // MP: replaced by the module-owned fixture page
 		$page = $this->getTestPage();
 		if (!$page instanceof Page || !$page->id) return null;
 
@@ -1032,6 +1129,203 @@ class ProcessShowcase extends Process implements ConfigurableModule
 	}
 
 	/* ---------------------------------------------------------------------
+	 * Comments
+	 * ------------------------------------------------------------------- */
+
+	/**
+	 * Showcase a real Comments field with moderation states.
+	 *
+	 * @return string
+	 */
+	public function ___executeComments()
+	{
+		$this->headline('Comments');
+		$this->breadcrumb('../', $this->_('Showcase'));
+
+		$fixture = $this->ensureCommentsFixture();
+		if (!$fixture) {
+			return '<p class="uk-alert-warning" uk-alert>' . $this->_('FieldtypeComments is not installed.') . '</p>';
+		}
+
+		$fixturePage = $fixture['page'];
+		$fixturePage->of(false);
+		$commentsInputfield = $fixturePage->getInputfield(self::COMMENTS_FIXTURE_FIELD);
+		if (!$commentsInputfield instanceof InputfieldCommentsAdmin) {
+			throw new WireException($this->_('Unable to create the comments showcase Inputfield.'));
+		}
+		$commentsInputfield->label = $this->_('InputfieldCommentsAdmin');
+		$commentsInputfield->description = $this->_('Edit seeded featured, approved, pending and spam comments, including ratings, votes and moderation status.');
+
+		$form = $this->requireModule(InputfieldForm::class);
+		$form->attr('method', 'post');
+		$form->attr('action', './');
+		$form->description = $this->_('FieldtypeComments field backed by a disposable ProcessShowcase page.');
+
+		$fieldset = $this->requireModule(InputfieldFieldset::class);
+		$fieldset->label = $this->_('Comment moderation');
+		$fieldset->icon = 'comments';
+		$fieldset->add($commentsInputfield);
+		$form->add($fieldset);
+
+		$submit = $this->requireModule(InputfieldSubmit::class);
+		$submit->attr('name', 'submit_comments');
+		$submit->val($this->_('Save comments'));
+		$submit->icon = 'check';
+		$submit->showInHeader(true);
+		$form->add($submit);
+
+		if ($form->isSubmitted('submit_comments')) {
+			$this->session->CSRF()->validate();
+			$form->processInput($this->input->post);
+			$fixturePage->set(self::COMMENTS_FIXTURE_FIELD, $commentsInputfield->val());
+			$fixturePage->save(self::COMMENTS_FIXTURE_FIELD);
+			$this->message($this->_('Comments saved.'));
+		}
+
+		return $form->render();
+	}
+
+	/**
+	 * Ensure the disposable comments page, field and seeded comments exist.
+	 *
+	 * @return array{field: CommentField, page: Page}|null
+	 */
+	protected function ensureCommentsFixture(): ?array
+	{
+		$fieldtype = $this->modules->get('FieldtypeComments');
+		if (!$fieldtype instanceof FieldtypeComments) return null;
+
+		$template = $this->templates->get(self::COMMENTS_FIXTURE_TEMPLATE);
+		if (!$template instanceof Template) {
+			$template = $this->templates->new(self::COMMENTS_FIXTURE_TEMPLATE);
+			$template->noChildren = 1;
+			$template->noParents = -1;
+			$template->save();
+		} elseif (!$template->fieldgroup) {
+			$template->save();
+		}
+
+		$fieldgroup = $template->fieldgroup;
+		$titleField = $this->fields->get('title');
+		if (!$fieldgroup instanceof Fieldgroup || !$titleField instanceof Field) return null;
+		if (!$fieldgroup->hasField($titleField)) $fieldgroup->add($titleField);
+
+		$field = $this->fields->get(self::COMMENTS_FIXTURE_FIELD);
+		if (!$field instanceof CommentField) {
+			$field = $this->fields->new($fieldtype, self::COMMENTS_FIXTURE_FIELD, ['label' => $this->_('Showcase comments')]);
+		}
+		if (!$field instanceof CommentField) return null;
+		$field->label = $this->_('Showcase comments');
+		$field->moderate = FieldtypeComments::moderateAll;
+		$field->useVotes = FieldtypeComments::useVotesAll;
+		$field->useStars = FieldtypeComments::useStarsYes;
+		$field->useWebsite = 1;
+		$field->depth = 2;
+		$field->dateFormat = 'relative';
+		$field->save();
+
+		if (!$fieldgroup->hasField($field)) $fieldgroup->add($field);
+		$fieldgroup->save();
+
+		$page = $this->pages->get('include=all, template=' . self::COMMENTS_FIXTURE_TEMPLATE . ', name=' . self::COMMENTS_FIXTURE_PAGE);
+		if (!$page->id) {
+			$page = $this->pages->new([
+				'template' => $template,
+				'parent' => 1,
+				'name' => self::COMMENTS_FIXTURE_PAGE,
+				'title' => $this->_('ProcessShowcase comments fixture'),
+				'status' => Page::statusHidden,
+			]);
+		}
+
+		if (!$field->get(self::COMMENTS_FIXTURE_INITIALIZED)) {
+			$seeds = [
+				[
+					'cite' => $this->_('Maya Chen'),
+					'email' => 'maya@example.com',
+					'website' => 'https://example.com/maya',
+					'text' => $this->_('The moderation workflow is clear and the featured state reads well.'),
+					'status' => Comment::statusFeatured,
+					'stars' => 5,
+					'upvotes' => 8,
+					'downvotes' => 1,
+					'created' => time() - 86400 * 5,
+				],
+				[
+					'cite' => $this->_('Luka Novak'),
+					'email' => 'luka@example.com',
+					'text' => $this->_('Approved comment used to verify the normal published state.'),
+					'status' => Comment::statusApproved,
+					'stars' => 4,
+					'upvotes' => 3,
+					'downvotes' => 0,
+					'created' => time() - 86400 * 3,
+				],
+				[
+					'cite' => $this->_('Amina Yusuf'),
+					'email' => 'amina@example.com',
+					'text' => $this->_('Pending comment awaiting a moderation decision.'),
+					'status' => Comment::statusPending,
+					'stars' => 3,
+					'upvotes' => 0,
+					'downvotes' => 0,
+					'created' => time() - 86400,
+				],
+				[
+					'cite' => $this->_('Automated Visitor'),
+					'email' => 'spam@example.com',
+					'text' => $this->_('Spam-state specimen for destructive and warning styling.'),
+					'status' => Comment::statusSpam,
+					'stars' => 1,
+					'upvotes' => 0,
+					'downvotes' => 4,
+					'created' => time() - 3600,
+				],
+			];
+
+			if ($field->getNumComments($page) === 0) {
+				foreach ($seeds as $data) {
+					$comment = new Comment();
+					$comment->setArray($data);
+					$field->addComment($page, $comment, false);
+				}
+			}
+			$field->set(self::COMMENTS_FIXTURE_INITIALIZED, 1);
+			$field->save();
+		}
+
+		return ['field' => $field, 'page' => $page];
+	}
+
+	/**
+	 * Remove the comments fixture and its schema.
+	 *
+	 * @return void
+	 */
+	protected function removeCommentsFixture(): void
+	{
+		$page = $this->pages->get('include=all, template=' . self::COMMENTS_FIXTURE_TEMPLATE . ', name=' . self::COMMENTS_FIXTURE_PAGE);
+		if ($page->id) $this->pages->delete($page, true);
+
+		$field = $this->fields->get(self::COMMENTS_FIXTURE_FIELD);
+		if ($field instanceof Field) {
+			foreach ($this->fieldgroups as $fieldgroup) {
+				if (!$fieldgroup->hasField($field)) continue;
+				$fieldgroup->remove($field);
+				$fieldgroup->save();
+			}
+			$this->fields->delete($field);
+		}
+
+		$template = $this->templates->get(self::COMMENTS_FIXTURE_TEMPLATE);
+		if (!$template instanceof Template) return;
+		$fieldgroup = $template->fieldgroup;
+		if (!$fieldgroup instanceof Fieldgroup) return;
+		$this->templates->_callHookMethod('delete', [$template]);
+		$this->fieldgroups->delete($fieldgroup);
+	}
+
+	/* ---------------------------------------------------------------------
 	 * Text and editors
 	 * ------------------------------------------------------------------- */
 
@@ -1044,7 +1338,7 @@ class ProcessShowcase extends Process implements ConfigurableModule
 	{
 		$modules = $this->modules;
 
-		$this->headline($this->_('Text & editors'));
+		$this->headline('Text & editors');
 		$this->breadcrumb('../', $this->_('Showcase'));
 
 		$form = $this->requireModule(InputfieldForm::class);
@@ -1147,7 +1441,7 @@ class ProcessShowcase extends Process implements ConfigurableModule
 			$fieldset->add($field);
 		}
 
-		/* MP: expose heading code sizes covered by ProcessWire's admin typography */
+		/* expose heading code sizes covered by ProcessWire's admin typography */
 		$field = $this->requireModule(InputfieldMarkup::class);
 		$field->label = $this->_('Code in headings');
 		$field->val(
@@ -1167,7 +1461,12 @@ class ProcessShowcase extends Process implements ConfigurableModule
 			$field->attr('name', 'rich_ckeditor');
 			$field->label = $this->_('InputfieldCKEditor');
 			$field->description = $this->_('Extends InputfieldTextarea with CKEditor rich-text editing, including the wordcount plugin.');
-			$field->extraPlugins = array_merge($field->extraPlugins, ['wordcount']);
+			$field->extraPlugins = array_merge((array) $field->extraPlugins, ['wordcount']);
+			$assetPage = $this->getTestPage();
+			if ($assetPage) {
+				$field->set('hasPage', $assetPage); // provide page context required by rich-text asset plugins
+				$field->wrapAttr('data-pid', (string) $assetPage->id); // pwimage fallback when no ProcessPageEdit ID input exists
+			}
 			$fieldset->add($field);
 		}
 
@@ -1177,6 +1476,11 @@ class ProcessShowcase extends Process implements ConfigurableModule
 			$field->label = $this->_('InputfieldTinyMCE');
 			$field->description = $this->_('Extends InputfieldTextarea with TinyMCE rich-text editing, including the wordcount plugin.');
 			$field->plugins = 'anchor code link lists pwimage pwlink table wordcount';
+			$assetPage = $this->getTestPage();
+			if ($assetPage) {
+				$field->set('hasPage', $assetPage); // provide page context required by rich-text asset plugins
+				$field->wrapAttr('data-pid', (string) $assetPage->id); // pwimage/pwlink fallback outside ProcessPageEdit
+			}
 			$fieldset->add($field);
 		}
 
@@ -1242,7 +1546,7 @@ HTML;
 	 */
 	public function ___executeChoices()
 	{
-		$this->headline($this->_('Checkboxes, radios & toggles'));
+		$this->headline('Checkboxes, radios & toggles');
 		$this->breadcrumb('../', $this->_('Showcase'));
 
 		$form = $this->requireModule(InputfieldForm::class);
@@ -1383,9 +1687,9 @@ HTML;
 	 */
 	public function ___executePagelist()
 	{
-		// MP: static PageList specimens need the core stylesheet for inline actions and tree layout.
+		// static PageList specimens need the core stylesheet for inline actions and tree layout.
 		$this->wire()->config->styles->add($this->wire()->config->urls->modules . 'Process/ProcessPageList/ProcessPageList.css');
-		$this->headline($this->_('PageList states'));
+		$this->headline('PageList states');
 		$this->breadcrumb('../', $this->_('Showcase'));
 
 		$states = [
@@ -1435,7 +1739,7 @@ HTML;
 		$input = $this->input;
 		$notice = $input->get->name('notice');
 
-		$this->headline($this->_('Notices and dialogs'));
+		$this->headline('Notices and dialogs');
 		$this->breadcrumb('../', $this->_('Showcase'));
 
 		if ($notice === 'message') {
@@ -1447,7 +1751,7 @@ HTML;
 		} elseif ($notice === 'all') {
 			$this->message($this->_('Example message notice.'));
 			$this->warning($this->_('Example warning notice.'));
-			$this->warning($this->_('Additional warning detail.')); // MP: exercise the native grouped-notice toggle
+			$this->warning($this->_('Additional warning detail.')); // exercise the native grouped-notice toggle
 			$this->error($this->_('Example error notice.'));
 		}
 
@@ -1505,7 +1809,7 @@ SCRIPT;
 		$input   = $this->input;
 		$session = $this->session;
 
-		$this->headline($this->_('Buttons & action menus'));
+		$this->headline('Buttons & action menus');
 		$this->breadcrumb('../', $this->_('Showcase'));
 
 		// Process form first so we can show the result above the next form.
@@ -1556,7 +1860,6 @@ SCRIPT;
 		$iconButton->icon = 'refresh';
 
 		$linkButton = $this->requireModule(InputfieldButton::class);
-		// $linkButton->val($this->_('Open form fields')); // MP: Form fields renamed to Basic inputs
 		$linkButton->val($this->_('Open basic inputs'));
 		$linkButton->icon = 'external-link';
 		$linkButton->href = '../forms/';
@@ -1623,7 +1926,6 @@ SCRIPT;
 		$markup->val(
 			'<div class="uk-button-group">' .
 				'<a class="ui-button ui-state-default" href="../" aria-label="' . $this->_('Dashboard') . '" title="' . $this->_('Dashboard') . '"><i class="fa fa-fw fa-tachometer"></i><span class="uk-visible@s"> ' . $this->_('Dashboard') . '</span></a>' .
-				// MP: Form fields renamed to Basic inputs.
 				'<a class="ui-button ui-state-default" href="../forms/" aria-label="' . $this->_('Basic inputs') . '" title="' . $this->_('Basic inputs') . '"><i class="fa fa-fw fa-list-alt"></i><span class="uk-visible@s"> ' . $this->_('Basic inputs') . '</span></a>' .
 				'<a class="ui-button ui-state-default" href="./" aria-label="' . $this->_('Refresh') . '" title="' . $this->_('Refresh') . '"><i class="fa fa-fw fa-refresh"></i><span class="uk-visible@s"> ' . $this->_('Refresh') . '</span></a>' .
 				'</div>'
@@ -1683,7 +1985,7 @@ SCRIPT;
 		$session   = $this->session;
 		$sanitizer = $this->sanitizer;
 
-		$this->headline($this->_('Repeaters'));
+		$this->headline('Repeaters');
 		$this->breadcrumb('../', $this->_('Showcase'));
 
 		$nativeRepeaterOut = $this->renderNativeRepeaterTestCase();
@@ -2126,7 +2428,7 @@ JS;
 	 */
 	public function ___executeTables()
 	{
-		$this->headline($this->_('Tables'));
+		$this->headline('Tables');
 		$this->breadcrumb('../', $this->_('Showcase'));
 
 		$rows = $this->getDemoData();
@@ -2280,7 +2582,7 @@ JS;
 	 */
 	public function ___executeLists()
 	{
-		$this->headline($this->_('Lists'));
+		$this->headline('Lists');
 		$this->breadcrumb('../', $this->_('Showcase'));
 
 		$rows = $this->getDemoData();
@@ -2336,7 +2638,7 @@ JS;
 	/** Render the upstream HTML fixture inside the active admin theme. */
 	public function ___executeHtmlElements(): string
 	{
-		$this->headline($this->_('HTML elements'));
+		$this->headline('HTML elements');
 		$this->breadcrumb('../', $this->_('Showcase'));
 
 		$html = file_get_contents(__DIR__ . '/fixtures/html5-test-page/index.html');
@@ -2373,7 +2675,7 @@ JS;
 	 */
 	public function ___executeCards()
 	{
-		$this->headline($this->_('Cards'));
+		$this->headline('Cards');
 		$this->breadcrumb('../', $this->_('Showcase'));
 
 		$rows = $this->getDemoData();
