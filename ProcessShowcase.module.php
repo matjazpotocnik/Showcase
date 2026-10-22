@@ -90,6 +90,7 @@ class ProcessShowcase extends Process implements ConfigurableModule
 				['url' => 'choices/',   'label' => 'Checkboxes, radios & toggles', 'icon' => 'check-square-o'],
 				['url' => 'actions/',   'label' => 'Buttons & action menus', 'icon' => 'bolt'],
 				['url' => 'forms/',     'label' => 'Basic inputs',      'icon' => 'list-alt'],
+				['url' => 'sections-tiles/', 'label' => 'Sections & tiles', 'icon' => 'paint-brush'],
 				['url' => 'selection-controls/', 'label' => 'Selection controls', 'icon' => 'list'],
 				['url' => 'files-images/', 'label' => 'Files & images',  'icon' => 'picture-o'],
 				['url' => 'comments/',   'label' => 'Comments',          'icon' => 'comments'],
@@ -99,7 +100,9 @@ class ProcessShowcase extends Process implements ConfigurableModule
 				['url' => 'lists/',     'label' => 'Lists',             'icon' => 'list-ul'],
 				['url' => 'cards/',     'label' => 'Cards',             'icon' => 'th'],
 				['url' => 'html-elements/', 'label' => 'HTML elements', 'icon' => 'html5'],
-				['url' => 'pagelist/',  'label' => 'PageList states',   'icon' => 'sitemap'],
+				['url' => 'uikit/', 'label' => 'UIkit components', 'icon' => 'th-large'],
+				//['url' => 'uikit-frozen/', 'label' => 'Current vs frozen admin', 'icon' => 'columns'],
+				['url' => 'pagelist/',  'label' => 'PageList states & pagination',   'icon' => 'sitemap'],
 				['url' => 'feedback/',  'label' => 'Notices & dialogs', 'icon' => 'commenting'],
 			],
 		];
@@ -254,21 +257,24 @@ class ProcessShowcase extends Process implements ConfigurableModule
 
 		// Quick action tiles linking to each subpage.
 		$tiles = [
-			['url' => 'forms/',    'icon' => 'list-alt',   'label' => $this->_('Basic inputs'), 'desc' => $this->_('Numeric, date and utility Inputfields.')],
-			['url' => 'selection-controls/', 'icon' => 'list', 'label' => $this->_('Selection controls'), 'desc' => $this->_('Dropdowns, listboxes, ordered selections and visual pickers.')], // MP
+			['url' => 'forms/',    'icon' => 'list-alt',   'label' => $this->_('Basic inputs'), 'desc' => $this->_('Number, date and other basic fields.')],
+			['url' => 'selection-controls/', 'icon' => 'list', 'label' => $this->_('Selection controls'), 'desc' => $this->_('Dropdowns, lists, sortable choices and visual pickers.')],
 			['url' => 'page-references/', 'icon' => 'sitemap', 'label' => $this->_('Page references'), 'desc' => $this->_('Choose pages using dropdowns, lists, search, tags, or the page tree.')],
-			['url' => 'files-images/', 'icon' => 'picture-o', 'label' => $this->_('Files & images'), 'desc' => $this->_('File and image upload Inputfields, including rendered gallery states.')],
+			['url' => 'files-images/', 'icon' => 'picture-o', 'label' => $this->_('Files & images'), 'desc' => $this->_('Upload and manage files and images.')],
 			['url' => 'comments/', 'icon' => 'comments', 'label' => $this->_('Comments'), 'desc' => $this->_('Moderate featured, approved, pending and spam comments.')],
-			['url' => 'text/',     'icon' => 'font',       'label' => $this->_('Text & editors'), 'desc' => $this->_('Single-line, multi-line, sanitized and rich-text Inputfields.')],
-			['url' => 'choices/',  'icon' => 'check-square-o', 'label' => $this->_('Checkboxes, radios & toggles'), 'desc' => $this->_('Single and multiple choices with their submitted value contracts.')],
-			['url' => 'actions/',  'icon' => 'bolt',       'label' => $this->_('Buttons & action menus'), 'desc' => $this->_('Button hierarchy, grouped controls and submit buttons with dropdown actions.')],
-			['url' => 'repeater/', 'icon' => 'clone',      'label' => $this->_('Repeaters'), 'desc' => $this->_('Test native InputfieldRepeater and Process-module repeating groups.')],
-			['url' => 'tables/',   'icon' => 'table',      'label' => $this->_('Tables'),         'desc' => $this->_('Sortable data tables via MarkupAdminDataTable.')],
+			['url' => 'text/',     'icon' => 'font',       'label' => $this->_('Text & editors'), 'desc' => $this->_('Text fields, text areas and rich-text editors.')],
+			['url' => 'choices/',  'icon' => 'check-square-o', 'label' => $this->_('Checkboxes, radios & toggles'), 'desc' => $this->_('Single and multiple choices.')],
+			['url' => 'actions/',  'icon' => 'bolt',       'label' => $this->_('Buttons & action menus'), 'desc' => $this->_('Buttons, button groups and menus of submit actions.')],
+			['url' => 'repeater/', 'icon' => 'clone',      'label' => $this->_('Repeaters'), 'desc' => $this->_('Repeating groups of fields.')],
+			['url' => 'tables/',   'icon' => 'table',      'label' => $this->_('Tables'),         'desc' => $this->_('Sortable data tables.')],
 			['url' => 'lists/',    'icon' => 'list-ul',    'label' => $this->_('Lists'),          'desc' => $this->_('Description lists, nav lists and badge lists.')],
-			['url' => 'cards/',    'icon' => 'th',         'label' => $this->_('Cards'),          'desc' => $this->_('Card grid layouts using UIkit.')],
-			['url' => 'html-elements/', 'icon' => 'html5', 'label' => $this->_('HTML elements'), 'desc' => $this->_('The upstream HTML5 test page rendered with the admin theme.')],
-			['url' => 'pagelist/', 'icon' => 'sitemap',    'label' => $this->_('PageList states'), 'desc' => $this->_('Open, hidden, unpublished, locked and loading page-tree states.')],
+			['url' => 'cards/',    'icon' => 'th',         'label' => $this->_('Cards'),          'desc' => $this->_('Card layouts.')],
+			['url' => 'html-elements/', 'icon' => 'html5', 'label' => $this->_('HTML elements'), 'desc' => $this->_('HTML elements styled by the admin theme.')],
+			['url' => 'uikit/', 'icon' => 'th-large', 'label' => $this->_('UIkit components'), 'desc' => $this->_('UIkit component catalogue with the active admin theme.')],
+			//['url' => 'uikit-frozen/', 'icon' => 'columns', 'label' => $this->_('Current vs frozen admin'), 'desc' => $this->_('UIkit catalogue: current V2 + TR against frozen admin_merged.css.')],
+			['url' => 'pagelist/', 'icon' => 'sitemap',    'label' => $this->_('PageList states & pagination'), 'desc' => $this->_('Various page-tree states and pagination.')],
 			['url' => 'feedback/', 'icon' => 'commenting', 'label' => $this->_('Notices & dialogs'), 'desc' => $this->_('Admin notices, confirms, alerts and iframe modals.')],
+			['url' => 'sections-tiles/', 'icon' => 'paint-brush', 'label' => $this->_('Sections & tiles'), 'desc' => $this->_('Section and tile samples.')],
 		];
 
 		$out .= '<h2 class="uk-margin-large-top">' . $this->_('Explore the patterns') . '</h2>';
@@ -322,8 +328,75 @@ class ProcessShowcase extends Process implements ConfigurableModule
 	}
 
 	/* ---------------------------------------------------------------------
-	 * Basic inputs showcase
+	 * Palette comparison showcase
 	 * ------------------------------------------------------------------- */
+
+	/**
+	 * Showcase section and tile palette contexts.
+	 *
+	 * @return string
+	 */
+	public function ___executeSectionsTiles()
+	{
+		$this->headline('Sections & tiles');
+		$this->breadcrumb('../', $this->_('Showcase'));
+
+		// MP: Palette samples have their own Showcase destination, separate from Basic inputs.
+		$paletteSamples = <<<'HTML'
+<p class="uk-margin-small-top uk-margin-remove-bottom">Plain text <a href="#Inputfield_p2_palette_comparison">Ordinary link</a> <a class="uk-link-muted" href="#Inputfield_p2_palette_comparison">Muted link</a></p>
+HTML;
+		$buttonSamples = '<div class="uk-margin-small-top">';
+		foreach (['default' => 'Default', 'primary' => 'Primary', 'secondary' => 'Secondary'] as $buttonStyle => $buttonLabel) {
+			$buttonSamples .= '<div class="uk-flex uk-flex-wrap uk-grid-small uk-margin-small-top" uk-grid>';
+			foreach (['normal' => '', 'selected' => ' uk-active', 'disabled' => ''] as $buttonState => $stateClass) {
+				$buttonSamples .= '<div><button type="button" class="uk-button uk-margin-small-bottom uk-button-' . $buttonStyle . $stateClass . '"' .
+					($buttonState === 'disabled' ? ' disabled' : '') .
+					($buttonState === 'selected' ? ' aria-pressed="true"' : '') . '>' .
+					$this->sanitizer->entities($this->_($buttonLabel) . ($buttonState === 'normal' ? '' : ' ' . $this->_(ucfirst($buttonState)))) .
+					'</button></div>';
+			}
+			$buttonSamples .= '</div>';
+		}
+		$buttonSamples .= '</div>';
+		$paletteSamples .= $buttonSamples;
+		$paletteContexts = [
+			'Ordinary' => 'uk-padding-small',
+			'Default section' => 'uk-section uk-section-default uk-padding-small',
+			'Muted section' => 'uk-section uk-section-muted uk-padding-small',
+			'Primary section' => 'uk-section uk-section-primary uk-padding-small',
+			'Secondary section' => 'uk-section uk-section-secondary uk-padding-small',
+			'Muted tile' => 'uk-tile uk-tile-muted uk-padding-small',
+			'Primary tile' => 'uk-tile uk-tile-primary uk-padding-small',
+			'Secondary tile' => 'uk-tile uk-tile-secondary uk-padding-small',
+			'Primary section, preserve color' => 'uk-section uk-section-primary uk-preserve-color uk-padding-small',
+			'Secondary section, preserve color' => 'uk-section uk-section-secondary uk-preserve-color uk-padding-small',
+			'Primary tile, preserve color' => 'uk-tile uk-tile-primary uk-preserve-color uk-padding-small',
+			'Secondary tile, preserve color' => 'uk-tile uk-tile-secondary uk-preserve-color uk-padding-small',
+		];
+		/* MP: Keep the contextual button state matrix readable at desktop widths. */
+		/* $paletteMarkup = '<div id="ShowcaseP2Palette" class="uk-grid-small uk-child-width-1-2@s uk-child-width-1-4@m" uk-grid>'; */
+		$paletteMarkup = '<div id="ShowcaseP2Palette" class="uk-grid-small uk-child-width-1-2@m" uk-grid>';
+		foreach ($paletteContexts as $contextLabel => $contextClasses) {
+			$displayClasses = implode(' ', array_diff(explode(' ', $contextClasses), ['uk-padding-small']));
+			$paletteMarkup .= '<div><div class="' . $contextClasses . '" aria-label="' .
+				$this->sanitizer->entities($contextLabel) . '"><div class="uk-text-small">' .
+				$this->sanitizer->entities($displayClasses) . '</div>' . $paletteSamples . '</div></div>';
+		}
+		$paletteMarkup .= '</div>';
+		$paletteCard = '<div id="Inputfield_p2_palette_comparison" class="uk-card uk-card-default uk-card-body uk-card-small uk-margin-bottom">' .
+			'<h2 class="uk-card-title"><i class="fa fa-paint-brush uk-margin-small-right" aria-hidden="true"></i>' .
+			$this->_('Sections & tiles') . '</h2>' . $paletteMarkup . '</div>';
+
+		$showcaseUrl = $this->sanitizer->entities($this->config->urls->admin . 'setup/showcase/');
+		$componentMarkup = '<section class="uk-margin-top"><h2>' . $this->_('Navigation components') . '</h2>' .
+			'<p><a class="uk-link-toggle" href="' . $showcaseUrl . 'cards/">' . $this->_('Showcase') . ': <span class="uk-link">' . $this->_('Cards') . '</span></a></p>' .
+			'<button type="button" class="uk-navbar-toggle" aria-expanded="false" aria-controls="ShowcasePaletteMenu" onclick="const menu = document.getElementById(\'ShowcasePaletteMenu\'); menu.hidden = !menu.hidden; this.setAttribute(\'aria-expanded\', String(!menu.hidden));"><i class="fa fa-bars uk-margin-small-right" aria-hidden="true"></i>' . $this->_('Menu') . '</button>' .
+			'<ul id="ShowcasePaletteMenu" class="uk-nav uk-nav-default" hidden><li><a href="' . $showcaseUrl . 'actions/">' . $this->_('Buttons & action menus') . '</a></li><li><a href="' . $showcaseUrl . 'cards/">' . $this->_('Cards') . '</a></li></ul>' .
+			'<ul class="uk-iconnav"><li><a href="' . $showcaseUrl . '" title="' . $this->_('Showcase') . '" aria-label="' . $this->_('Showcase') . '"><i class="fa fa-home" aria-hidden="true"></i></a></li><li class="uk-active"><a href="' . $showcaseUrl . 'sections-tiles/" title="' . $this->_('Sections & tiles') . '" aria-label="' . $this->_('Sections & tiles') . '" aria-current="page"><i class="fa fa-paint-brush" aria-hidden="true"></i></a></li></ul>' .
+			'<ul class="uk-breadcrumb"><li><a href="' . $showcaseUrl . '">' . $this->_('Showcase') . '</a></li><li><span aria-current="page">' . $this->_('Sections & tiles') . '</span></li></ul></section>';
+
+		return $paletteCard . $componentMarkup;
+	}
 
 	/**
 	 * Showcase common numeric, date and utility Inputfield types.
@@ -437,6 +510,87 @@ class ProcessShowcase extends Process implements ConfigurableModule
 		$f->addClass('uk-form-danger');
 		$f->columnWidth = 50;
 		$fs->add($f);
+
+		$colorFieldset = $this->requireModule(InputfieldFieldset::class);
+		$colorFieldset->label = $this->_('Inputfield colors');
+		$colorFieldset->description = $this->_('Color themes distinguish primary settings, supporting information, notes and status messages.');
+		$colorFieldset->icon = 'paint-brush';
+		$form->add($colorFieldset);
+
+		$colorVariants = [
+			'primary' => [$this->_('Primary'), $this->_('Main project setting')],
+			'secondary' => [$this->_('Secondary'), $this->_('Supporting information')],
+			'highlight' => [$this->_('Highlight'), $this->_('Important note')],
+			'warning' => [$this->_('Warning'), $this->_('Review before saving')],
+			'success' => [$this->_('Success'), $this->_('Ready to publish')],
+			'danger' => [$this->_('Danger'), $this->_('Action required')],
+		];
+		foreach ($colorVariants as $color => [$label, $value]) {
+			$f = $this->requireModule(InputfieldText::class);
+			$f->attr('name', "theme_color_$color");
+			$f->label = $label;
+			$f->attr('value', $value);
+			$f->themeColor = $color;
+			$f->columnWidth = 33;
+			$colorFieldset->add($f);
+		}
+
+		$borderFieldset = $this->requireModule(InputfieldFieldset::class);
+		$borderFieldset->label = $this->_('Inputfield borders');
+		$borderFieldset->description = $this->_('Border treatments can preserve, soften, remove or elevate a field wrapper within a larger settings panel.');
+		$borderFieldset->icon = 'square-o';
+		$borderFieldset->themeColor = 'highlight';
+		$form->add($borderFieldset);
+
+		$borderVariants = [
+			'hide' => [$this->_('Transparent border'), $this->_('Keeps normal padding and spacing')],
+			'none' => [$this->_('No border'), $this->_('Blends into the surrounding panel')],
+			'line' => [$this->_('Standard outline'), $this->_('Clearly separates the field')],
+			'card' => [$this->_('Card'), $this->_('Elevates a related group of settings')],
+		];
+		foreach ($borderVariants as $border => [$label, $value]) {
+			$f = $this->requireModule(InputfieldText::class);
+			$f->attr('name', "theme_border_$border");
+			$f->label = $label;
+			$f->attr('value', $value);
+			$f->themeBorder = $border;
+			$f->columnWidth = 50;
+			$borderFieldset->add($f);
+		}
+
+		$spacingFieldset = $this->requireModule(InputfieldFieldset::class);
+		$spacingFieldset->label = $this->_('Inputfield spacing');
+		$spacingFieldset->description = $this->_('Offsets add breathing room before and after standalone groups of settings.');
+		$spacingFieldset->icon = 'arrows-v';
+		$form->add($spacingFieldset);
+
+		$offsetVariants = [
+			's' => [$this->_('Small offset'), $this->_('Closely related settings')],
+			'm' => [$this->_('Medium offset'), $this->_('A new settings group')],
+			'l' => [$this->_('Large offset'), $this->_('A clearly separate section')],
+		];
+		foreach ($offsetVariants as $offset => [$label, $value]) {
+			$f = $this->requireModule(InputfieldText::class);
+			$f->attr('name', "theme_offset_$offset");
+			$f->label = $label;
+			$f->attr('value', $value);
+			$f->themeOffset = $offset;
+			$spacingFieldset->add($f);
+		}
+
+		$sharedSurfaceFieldset = $this->requireModule(InputfieldFieldset::class);
+		$sharedSurfaceFieldset->label = $this->_('Fieldset with a shared surface');
+		$sharedSurfaceFieldset->description = $this->_('Child fields blend into the fieldset instead of each having a separate background.');
+		$sharedSurfaceFieldset->themeColor = 'highlight';
+		$colorFieldset->add($sharedSurfaceFieldset);
+
+		foreach (['one', 'two'] as $index) {
+			$f = $this->requireModule(InputfieldText::class);
+			$f->attr('name', "theme_is_color_$index");
+			$f->label = sprintf($this->_('Shared-surface child %s'), $index);
+			$f->attr('value', $this->_('Ordinary child field'));
+			$sharedSurfaceFieldset->add($f);
+		}
 
 		/* --- Hidden + markup --- */
 
@@ -722,7 +876,7 @@ class ProcessShowcase extends Process implements ConfigurableModule
 		$form = $this->requireModule(InputfieldForm::class);
 		$form->attr('method', 'post');
 		$form->attr('action', './');
-		$form->description = $this->_('InputfieldPage delegates selection and processing to a configured native Inputfield. All examples use existing pages and remain expanded so their delegates can be fully configured.');
+		$form->description = $this->_('Choose one or more existing pages using different controls. The examples stay open so you can inspect their settings.');
 
 		$single = $this->requireModule(InputfieldFieldset::class);
 		$single->label = $this->_('Select-based page pickers: single page');
@@ -781,8 +935,8 @@ class ProcessShowcase extends Process implements ConfigurableModule
 		$form->add($adaptive);
 
 		$adaptiveDelegates = [
-			['InputfieldPageAutocomplete', $this->_('InputfieldPageAutocomplete'), $this->_('AJAX-backed typeahead configured for multiple pages.')],
-			['InputfieldTextTags', $this->_('InputfieldTextTags'), $this->_('Tag-style input configured for multiple pages.')],
+			['InputfieldPageAutocomplete', $this->_('InputfieldPageAutocomplete'), $this->_('Search for and choose multiple pages.')],
+			['InputfieldTextTags', $this->_('InputfieldTextTags'), $this->_('Choose multiple pages as tags.')],
 		];
 		foreach ($adaptiveDelegates as $index => [$inputfield, $label, $description]) {
 			if (!$modules->isInstalled($inputfield)) continue;
@@ -827,13 +981,13 @@ class ProcessShowcase extends Process implements ConfigurableModule
 		if ($pageTableInputfield) {
 			$pageTableInputfield->attr('name', 'page_references_page_table');
 			$pageTableInputfield->label = $this->_('PageTable (read-only)');
-			$pageTableInputfield->description = $this->_('A real configured PageTable rendered in locked value mode so edit and delete actions remain disabled in the Showcase.');
+			$pageTableInputfield->description = $this->_('A read-only PageTable example. Editing and deleting are disabled here.');
 			$pageTableInputfield->collapsed = Inputfield::collapsedNoLocked;
 			$pageTable->add($pageTableInputfield);
 		} else {
 			$f = $this->requireModule(InputfieldMarkup::class);
 			$f->label = $this->_('PageTable');
-			$f->val('<p class="uk-text-muted">' . $this->_('No populated, configured PageTable field is available on this installation.') . '</p>');
+			$f->val('<p class="uk-text-muted">' . $this->_('No PageTable field with pages to show is available on this installation.') . '</p>');
 			$pageTable->add($f);
 		}
 
@@ -871,7 +1025,7 @@ class ProcessShowcase extends Process implements ConfigurableModule
 		$form->attr('method', 'post');
 		$form->attr('action', './');
 		$form->attr('enctype', 'multipart/form-data');
-		$form->description = $this->_('File and image Inputfields backed by a disposable ProcessShowcase page.');
+		$form->description = $this->_('Upload fields for files and images. Their example data is removed when Showcase is uninstalled.');
 
 		$fieldset = $this->requireModule(InputfieldFieldset::class);
 		$fieldset->label = $this->_('Files & images');
@@ -1482,6 +1636,28 @@ class ProcessShowcase extends Process implements ConfigurableModule
 				$field->wrapAttr('data-pid', (string) $assetPage->id); // pwimage/pwlink fallback outside ProcessPageEdit
 			}
 			$fieldset->add($field);
+
+			$field = $this->requireModule(InputfieldTinyMCE::class);
+			$field->attr('name', 'rich_tinymce_inline');
+			$field->label = $this->_('InputfieldTinyMCE inline mode');
+			//$field->description = $this->_('Extends InputfieldTextarea with TinyMCE rich-text editing using inline mode.');
+			$field->inlineMode = 1;
+			$field->val('<p>TinyMCE rich-text editing in inline mode.</p>');
+			$field->toolbar = 'bold italic pwlink pwimage blockquote hr bullist numlist table anchor code';
+			$field->prependMarkup = '<div id="showcase-inline-tinymce-toolbar"></div>';
+			$field->settingsJSON = json_encode([
+				'fixed_toolbar_container' => '#showcase-inline-tinymce-toolbar',
+				'toolbar_mode' => 'wrap',
+			], JSON_THROW_ON_ERROR);
+			$field->features = array_values(array_filter((array) $field->features, static function ($feature) {
+				return $feature !== 'menubar';
+			}));
+			$field->plugins = 'anchor code link lists pwimage pwlink table wordcount';
+			if ($assetPage) {
+				$field->set('hasPage', $assetPage);
+				$field->wrapAttr('data-pid', (string) $assetPage->id);
+			}
+			$fieldset->add($field);
 		}
 
 		if (!$modules->isInstalled('InputfieldCKEditor') && !$modules->isInstalled('InputfieldTinyMCE')) {
@@ -1540,7 +1716,7 @@ HTML;
 	 * ------------------------------------------------------------------- */
 
 	/**
-	 * Showcase choice Inputfields and their submitted value contracts.
+	 * Showcase choice Inputfields and the values they submit.
 	 *
 	 * @return string
 	 */
@@ -1574,7 +1750,7 @@ HTML;
 		$multiple = $this->requireModule(InputfieldCheckboxes::class);
 		$multiple->attr('name', 'notification_channels');
 		$multiple->label = $this->_('InputfieldCheckboxes');
-		$multiple->description = $this->_('Extends InputfieldSelectMultiple and allows selecting any number of options.');
+		$multiple->description = $this->_('Choose any number of options.');
 		$multiple->addOptions([
 			'email' => $this->_('Email'),
 			'browser' => $this->_('Browser'),
@@ -1584,6 +1760,26 @@ HTML;
 		$multiple->columnWidth = 50;
 		$fieldset->add($multiple);
 
+		$switches = $this->requireModule(InputfieldMarkup::class);
+		$switches->attr('name', 'ShowcaseCheckboxSwitches');
+		$switches->label = $this->_('Checkbox switches');
+		$switchStates = [
+			'unchecked' => [$this->_('Unchecked'), ''],
+			'checked' => [$this->_('Checked'), 'checked'],
+			'indeterminate' => [$this->_('Indeterminate'), 'data-indeterminate'],
+			'disabled' => [$this->_('Disabled'), 'disabled'],
+			'checked-disabled' => [$this->_('Checked (disabled)'), 'checked disabled'],
+			'indeterminate-disabled' => [$this->_('Indeterminate (disabled)'), 'data-indeterminate disabled'],
+		];
+		$switchMarkup = '<div class="pw-togcbx InputfieldCheckboxes"><ul class="InputfieldCheckboxesStacked">';
+		foreach ($switchStates as $state => [$label, $attributes]) {
+			$switchMarkup .= '<li><label for="ShowcaseSwitch-' . $state . '"><input id="ShowcaseSwitch-' . $state
+				. '" class="uk-checkbox" type="checkbox" ' . $attributes . '> '
+				. $this->sanitizer->entities($label) . '</label></li>';
+		}
+		$switches->value = $switchMarkup . '</ul></div>';
+		$fieldset->add($switches);
+
 		$fieldset = $this->requireModule(InputfieldFieldset::class);
 		$fieldset->label = $this->_('Radios');
 		$fieldset->icon = 'dot-circle-o';
@@ -1592,7 +1788,7 @@ HTML;
 		$radios = $this->requireModule(InputfieldRadios::class);
 		$radios->attr('name', 'interface_density');
 		$radios->label = $this->_('InputfieldRadios: fixed option width');
-		$radios->description = $this->_('Extends InputfieldSelect with fixed-width, auto-wrapping options.');
+		$radios->description = $this->_('Options have a fixed width and wrap to new rows.');
 		$radios->addOptions([
 			'compact' => $this->_('Compact'),
 			'comfortable' => $this->_('Comfortable'),
@@ -1607,7 +1803,7 @@ HTML;
 		$radioColumns = $this->requireModule(InputfieldRadios::class);
 		$radioColumns->attr('name', 'delivery_speed');
 		$radioColumns->label = $this->_('InputfieldRadios: equal columns');
-		$radioColumns->description = $this->_('Extends InputfieldSelect and arranges options in equal-width columns.');
+		$radioColumns->description = $this->_('Options are arranged in equal-width columns.');
 		$radioColumns->addOptions([
 			'standard' => $this->_('Standard'),
 			'express' => $this->_('Express'),
@@ -1626,7 +1822,7 @@ HTML;
 		$toggle = $this->requireModule(InputfieldToggle::class);
 		$toggle->attr('name', 'feature_status');
 		$toggle->label = $this->_('InputfieldToggle: enabled state');
-		$toggle->description = $this->_('Extends Inputfield with built-in Enabled and Disabled states.');
+		$toggle->description = $this->_('Switch between enabled and disabled.');
 		$toggle->labelType = InputfieldToggle::labelTypeEnabled;
 		$toggle->defaultOption = 'yes';
 		$toggle->columnWidth = 50;
@@ -1635,7 +1831,7 @@ HTML;
 		$toggleCustom = $this->requireModule(InputfieldToggle::class);
 		$toggleCustom->attr('name', 'approval_status');
 		$toggleCustom->label = $this->_('InputfieldToggle: custom third state');
-		$toggleCustom->description = $this->_('Extends Inputfield with custom labels and an optional third state.');
+		$toggleCustom->description = $this->_('Use custom labels with an optional third state.');
 		$toggleCustom->labelType = InputfieldToggle::labelTypeCustom;
 		$toggleCustom->yesLabel = $this->_('Approved');
 		$toggleCustom->noLabel = $this->_('Rejected');
@@ -1673,11 +1869,20 @@ HTML;
 			$resultOut = '<h2>' . $this->_('Processed values') . '</h2>' . $table->render();
 		}
 
-		return $resultOut . $form->render();
+		// MP: Native mixed state has no HTML attribute; keep this demo local to the form.
+		return $resultOut . $form->render() . <<<'HTML'
+<script>
+jQuery(function() {
+	document.querySelectorAll('#ShowcaseChoicesForm [data-indeterminate]').forEach(function(checkbox) {
+		checkbox.indeterminate = true;
+	});
+});
+</script>
+HTML;
 	}
 
 	/* ---------------------------------------------------------------------
-	 * PageList states
+	 * PageList states & pagination
 	 * ------------------------------------------------------------------- */
 
 	/**
@@ -1689,7 +1894,7 @@ HTML;
 	{
 		// static PageList specimens need the core stylesheet for inline actions and tree layout.
 		$this->wire()->config->styles->add($this->wire()->config->urls->modules . 'Process/ProcessPageList/ProcessPageList.css');
-		$this->headline('PageList states');
+		$this->headline('PageList states & pagination');
 		$this->breadcrumb('../', $this->_('Showcase'));
 
 		$states = [
@@ -1701,7 +1906,52 @@ HTML;
 			['class' => 'PageListNoChildren PageListStatusLocked', 'icon' => 'lock', 'title' => $this->_('Locked page'), 'note' => $this->_('Editing restricted'), 'count' => ''],
 		];
 
-		$out = '<p>' . $this->_('Stable visual specimens for states that are otherwise transient or difficult to reproduce in the live tree.') . '</p>';
+		$out = '<p>' . $this->_('Examples of page states that are hard to reproduce in the live page tree.') . '</p>';
+
+		// Pagination specimen: markup mirrors what MarkupPagerNav actually emits, for a pager
+		// sitting on page 4 of 20, so every item type is represented (previous, first, plain
+		// numbers, current, separator, last, next).
+		//
+		// Container and item classes come from AdminThemeUikit/init.php:81-88, which keeps both
+		// the UIkit class and the module's own hook: listMarkup => 'uk-pagination MarkupPagerNav',
+		// currentItemClass => 'uk-active MarkupPagerNavOn', separatorItemClass => 'uk-disabled
+		// MarkupPagerNavSeparator'. The positional classes (First / Last / FirstNum / LastNum)
+		// are MarkupPagerNav's own defaults, applied by its render loop at :324-349.
+		//
+		// Two things this specimen deliberately does NOT imitate:
+		//  - ProcessPageList, whose own pager is ul.PageListPagination. It hardcodes
+		//    'paginationClass' => 'PageListPagination' (ProcessPageList.module:333) and never
+		//    reads it from config, so the init.php:90-98 block setting paginationClass =>
+		//    'uk-pagination' is dead config. Only .MarkupPagerNav gets the uk-pagination class,
+		//    added at runtime by scripts/main.js:549.
+		//  - Calling MarkupPagerNav itself, which would emit true output but also inject
+		//    <link rel="next"> / <link rel="prev"> into this page's head via
+		//    updateConfigVars() (MarkupPagerNav.module:679) -- wrong links for this page.
+		$pagerItems = array(
+			array('label' => wireIconMarkup('angle-left'), 'href' => '?page=3', 'type' => 'previous', 'class' => 'MarkupPagerNavPrevious MarkupPagerNavFirst', 'aria' => 'Previous page'),
+			array('label' => '1', 'href' => '?page=1', 'type' => 'number', 'class' => 'MarkupPagerNavFirstNum', 'aria' => 'Page 1'),
+			array('label' => '2', 'href' => '?page=2', 'type' => 'number', 'class' => '', 'aria' => 'Page 2'),
+			array('label' => '3', 'href' => '?page=3', 'type' => 'number', 'class' => '', 'aria' => 'Page 3'),
+			array('label' => '4', 'href' => '?page=4', 'type' => 'current', 'class' => 'uk-active MarkupPagerNavOn', 'aria' => 'Page 4, current page'),
+			array('label' => '5', 'href' => '?page=5', 'type' => 'number', 'class' => '', 'aria' => 'Page 5'),
+			array('label' => '<span>&hellip;</span>', 'href' => '', 'type' => 'separator', 'class' => 'uk-disabled MarkupPagerNavSeparator', 'aria' => ''),
+			array('label' => '20', 'href' => '?page=20', 'type' => 'last', 'class' => 'MarkupPagerNavLastNum', 'aria' => 'Page 20, last page'),
+			array('label' => wireIconMarkup('angle-right'), 'href' => '?page=5', 'type' => 'next', 'class' => 'MarkupPagerNavNext MarkupPagerNavLast', 'aria' => 'Next page'),
+		);
+
+		$pagerMarkup = '<ul class="uk-pagination MarkupPagerNav">';
+		foreach($pagerItems as $pagerItem) {
+			$pagerItemAttr = $pagerItem['type'] === 'current' ? " aria-current='true'" : '';
+			$pagerItemClass = $pagerItem['class'] !== '' ? " class='" . $pagerItem['class'] . "'" : '';
+			if($pagerItem['href'] !== '') {
+				$pagerItemOut = "<a href='" . $pagerItem['href'] . "'><span>" . $pagerItem['label'] . '</span></a>';
+			} else {
+				$pagerItemOut = $pagerItem['label'];
+			}
+			$pagerMarkup .= '<li aria-label="' . $pagerItem['aria'] . '"' . $pagerItemClass . $pagerItemAttr . '>' . $pagerItemOut . '</li>';
+		}
+		$pagerMarkup .= '</ul>';
+
 		$out .= '<div class="PageListRoot"><div class="PageList">';
 		foreach ($states as $index => $state) {
 			$out .= '<div class="PageListItem PageListID' . (9000 + $index) . ' ' . $state['class'] . '">';
@@ -1715,12 +1965,31 @@ HTML;
 			$out .= '</ul>';
 			$out .= '</div>';
 			if ($index === 0) {
+				$out .= $pagerMarkup;
 				$out .= '<div class="PageList"><div class="PageListItem PageListNoChildren"><a class="PageListPage label" href="#"><i class="icon fa fa-file-o"></i><span>' . $this->_('Nested child page') . '</span></a></div></div>';
 			}
 		}
 		$out .= '<div class="PageListItem PageListHasChildren PageListItemOpen"><span class="PageListLoading"><i class="fa fa-spin fa-spinner"></i></span><a class="PageListPage label" href="#"><i class="icon fa fa-folder-open"></i><span>' . $this->_('Loading children') . '</span></a></div>';
 		$out .= '<div class="PageListPlaceholder"><div class="PageListPlaceholderItem PageListSortPlaceholder">' . $this->_('Drag-and-drop placeholder') . '</div></div>';
 		$out .= '</div></div>';
+
+		$pagerLimit = 10;
+		$pagerTotal = 120;
+		$pagerPage = 4;
+		$pagerItems = new PaginatedArray();
+		$this->wire($pagerItems);
+		$pagerItems->setTotal($pagerTotal);
+		$pagerItems->setLimit($pagerLimit);
+		$pagerItems->setStart(($pagerPage - 1) * $pagerLimit);
+		$pager = $this->requireModule(MarkupPagerNav::class);
+		$out .= '<h2 class="uk-margin-large-top">' . $this->_('Pagination') . '</h2>';
+		$out .= '<p>' . $this->_('Native MarkupPagerNav with numbered, current, directional and separator states.') . '</p>';
+		$out .= '<nav aria-label="' . $this->sanitizer->entities($this->_('PageList example pagination')) . '">';
+		$out .= $pager->render($pagerItems, [
+			'baseUrl' => './',
+			'numPageLinks' => 5,
+		]);
+		$out .= '</nav>';
 
 		return $out;
 	}
@@ -1756,6 +2025,7 @@ HTML;
 		}
 
 		$this->requireModule(JqueryUI::class)->use('modal');
+		$this->requireModule(JqueryUI::class)->use('vex');
 
 		$out = '<h2>' . $this->_('Server notices') . '</h2>';
 		$out .= '<p>' . $this->_('Each action reloads this page through the normal Process notice lifecycle.') . '</p>';
@@ -1770,7 +2040,14 @@ HTML;
 		$out .= '<div class="uk-button-group">';
 		$out .= '<button type="button" id="ShowcaseAlert" class="ui-button ui-state-default"><i class="fa fa-info-circle"></i> ' . $this->_('Alert') . '</button>';
 		$out .= '<button type="button" id="ShowcaseConfirm" class="ui-button ui-state-default"><i class="fa fa-question-circle"></i> ' . $this->_('Confirm') . '</button>';
+		$out .= '<button type="button" id="ShowcaseInlineModal" class="ui-button ui-state-default"><i class="fa fa-window-maximize"></i> ' . $this->_('Inline modal') . '</button>';
 		$out .= '<a class="ui-button ui-state-default pw-modal pw-modal-medium" href="../cards/?modal=1"><i class="fa fa-window-maximize"></i> ' . $this->_('Iframe modal') . '</a>';
+		$out .= '</div>';
+		$out .= '<h2 class="uk-margin-large-top">' . $this->_('Vex dialogs') . '</h2>';
+		$out .= '<div class="uk-button-group">';
+		$out .= '<button type="button" id="ShowcaseVexAlert" class="ui-button ui-state-default"><i class="fa fa-info-circle"></i> ' . $this->_('Alert') . '</button>';
+		$out .= '<button type="button" id="ShowcaseVexConfirm" class="ui-button ui-state-default"><i class="fa fa-question-circle"></i> ' . $this->_('Confirm') . '</button>';
+		$out .= '<button type="button" id="ShowcaseVexPrompt" class="ui-button ui-state-default"><i class="fa fa-pencil"></i> ' . $this->_('Prompt') . '</button>';
 		$out .= '</div>';
 
 		$out .= <<<'SCRIPT'
@@ -1786,6 +2063,37 @@ jQuery(function($) {
 			funcOk: function() {
 				ProcessWire.alert('Confirmed.');
 			}
+		});
+	});
+	$('#ShowcaseInlineModal').on('click', function() {
+		$('<div><p>Review the selected items before continuing.</p><p>No changes have been saved.</p></div>').dialog({
+			title: 'Review selected items',
+			modal: true,
+			width: Math.min(480, window.innerWidth - 32),
+			maxHeight: Math.max(160, window.innerHeight - 48),
+			buttons: [
+				{ text: 'Cancel', click: function() { $(this).dialog('close'); } },
+				{ text: 'Continue', click: function() { $(this).dialog('close'); } }
+			],
+			close: function() {
+				$(this).dialog('destroy').remove();
+			}
+		});
+	});
+	$('#ShowcaseVexAlert').on('click', function() {
+		vex.dialog.alert('The operation completed successfully.');
+	});
+	$('#ShowcaseVexConfirm').on('click', function() {
+		vex.dialog.confirm({
+			message: 'Continue with this showcase action?',
+			callback: function() {}
+		});
+	});
+	$('#ShowcaseVexPrompt').on('click', function() {
+		vex.dialog.prompt({
+			message: 'Enter a label.',
+			placeholder: 'Label',
+			callback: function() {}
 		});
 	});
 });
@@ -2635,6 +2943,88 @@ JS;
 		return $out;
 	}
 
+	public function ___executeUikit(): string
+	{
+		return $this->renderUikitCatalogue();
+	}
+
+	public function ___executeUikitFrozen(): string
+	{
+		return $this->renderUikitCatalogue(true);
+	}
+
+	protected function renderUikitCatalogue(bool $frozen = false): string
+	{
+		// MP: Share the catalogue while keeping the original stock comparison route.
+		// $this->headline('UIkit components');
+		$this->headline($frozen ? 'Current vs frozen admin' : 'UIkit components');
+		$this->breadcrumb('../', $this->_('Showcase'));
+		$moduleUrl = $this->wire()->config->urls->get('ProcessShowcase');
+		if (!is_string($moduleUrl)) throw new WireException('Unable to resolve the Showcase URL.');
+		$frozenAttribute = '';
+		if ($frozen) {
+			$styles = [];
+			foreach ([
+				'base' => 'site/modules/AdminThemeUikit/uikit-pw/pw.min.css',
+				'common' => 'wire/templates-admin/styles/AdminTheme.css',
+				'tokens' => 'site/modules/AdminThemeUikit/themes/default/admin-custom.css',
+				'merged' => 'site/modules/AdminThemeUikit/uikit-konkat-v2/admin_merged.css',
+			] as $name => $relativePath) {
+				$path = $this->wire()->config->paths->root . $relativePath;
+				if (!is_file($path)) throw new WireException('Frozen admin stylesheet is missing: ' . $relativePath);
+				$styles[$name] = $this->wire()->config->urls->root . $relativePath . '?v=' . filemtime($path);
+			}
+			$frozenAttribute = ' data-frozen-styles="' . $this->sanitizer->entities(json_encode($styles, JSON_THROW_ON_ERROR)) . '"';
+		}
+		$adminTitle = $frozen ? 'Current admin (V2 + TR)' : 'Admin theme';
+		$comparisonTitle = $frozen ? 'Frozen admin (admin_merged.css)' : 'Stock UIkit';
+		$comparisonPreview = $frozen ? 'frozen' : 'stock';
+		$files = glob(__DIR__ . '/fixtures/uikit-tests/*.html');
+		if ($files === false) throw new WireException('Unable to read the UIkit catalogue.');
+		$options = '';
+		foreach ($files as $file) {
+			$name = basename($file, '.html');
+			$label = $name === 'index' ? 'Overview' : ucwords(str_replace('-', ' ', $name));
+			$options .= '<option value="' . $this->sanitizer->entities($name) . '"' . ($name === 'index' ? ' selected' : '') . '>' . $this->sanitizer->entities($label) . '</option>';
+		}
+		$this->wire()->config->scripts->append($moduleUrl . 'assets/uikit-preview.js?v=' . filemtime(__DIR__ . '/assets/uikit-preview.js'));
+		// MP: Pass explicit frozen assets without changing the site's head-removal hook.
+		// return '<div id="showcase-uikit" data-fixtures="' . $this->sanitizer->entities($moduleUrl . 'fixtures/uikit-tests/') . '">
+		return '<div id="showcase-uikit"' . $frozenAttribute . ' data-fixtures="' . $this->sanitizer->entities($moduleUrl . 'fixtures/uikit-tests/') . '">
+<div class="uk-flex uk-flex-wrap uk-flex-middle uk-margin-bottom" style="gap: 12px">
+<label>Component <select class="uk-select uk-form-width-medium" data-component>' . $options . '</select></label>
+<label>Admin theme <select class="uk-select uk-form-width-small" data-scheme><option value="light">Light</option><option value="dark">Dark</option></select></label>
+<label>Inverse context <select class="uk-select uk-form-width-small" data-inverse><option value="">None</option><option value="uk-light">Light text</option><option value="uk-dark">Dark text</option></select></label>
+<label><input class="uk-checkbox" type="checkbox" data-rtl> RTL</label>
+<label><input class="uk-checkbox" type="checkbox" data-inspect> Inspect</label>
+</div>
+<pre data-inspection hidden style="min-height: 3em; overflow-wrap: anywhere; white-space: pre-wrap; margin-bottom: 12px"></pre>
+<p data-error role="alert" hidden></p>
+<style>
+#showcase-uikit .showcase-comparison { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 22px; gap: 12px; }
+#showcase-uikit .showcase-comparison iframe { display: block; width: 100%; height: max(480px, 70vh); border: 1px solid var(--pw-border-color); box-sizing: border-box; }
+#showcase-uikit .showcase-scroll { overflow-y: scroll; height: max(480px, 70vh); margin-top: 30px; }
+/* MP: Allow the concrete stack labels to wrap without overlapping the previews. */
+/* #showcase-uikit .showcase-pane-title { height: 30px; margin: 0; font-size: 1rem; } */
+#showcase-uikit .showcase-pane-title { min-height: 30px; margin: 0; font-size: 1rem; overflow-wrap: anywhere; }
+@media (max-width: 639px) {
+	#showcase-uikit .showcase-comparison { grid-template-columns: minmax(0, 1fr) 22px; }
+	#showcase-uikit .showcase-scroll { grid-column: 2; grid-row: 1 / span 2; position: sticky; top: 20px; }
+	#showcase-uikit .showcase-pane { grid-column: 1; }
+}
+</style>
+<div class="showcase-comparison">
+<!-- MP: Retain the stock route and label the separate frozen comparison explicitly.
+<div class="showcase-pane"><h2 class="showcase-pane-title">Admin theme</h2><iframe data-preview="admin" title="Admin theme UIkit preview" sandbox="allow-scripts allow-same-origin"></iframe></div>
+<div class="showcase-pane"><h2 class="showcase-pane-title">Stock UIkit</h2><iframe data-preview="stock" title="Stock UIkit preview" sandbox="allow-scripts allow-same-origin"></iframe></div>
+-->
+<div class="showcase-pane"><h2 class="showcase-pane-title">' . $adminTitle . '</h2><iframe data-preview="admin" title="' . $adminTitle . ' UIkit preview" sandbox="allow-scripts allow-same-origin"></iframe></div>
+<div class="showcase-pane"><h2 class="showcase-pane-title">' . $comparisonTitle . '</h2><iframe data-preview="' . $comparisonPreview . '" title="' . $comparisonTitle . ' UIkit preview" sandbox="allow-scripts allow-same-origin"></iframe></div>
+<div class="showcase-scroll" data-scroll tabindex="0" role="region" aria-label="Scroll both previews"><div data-scroll-space></div></div>
+</div>
+</div>';
+	}
+
 	/** Render the upstream HTML fixture inside the active admin theme. */
 	public function ___executeHtmlElements(): string
 	{
@@ -2661,7 +3051,52 @@ JS;
 			$matches[1]
 		);
 
-		return '<div class="uk-card uk-card-default uk-card-body">' . $body . '</div>';
+		return '<style>
+.showcase-html-fixture #top > main > section {
+	margin-top: 48px;
+}
+.showcase-html-fixture #top > main > section > header {
+	margin-bottom: 28px;
+	padding: 12px 16px;
+	border-left: 4px solid var(--pw-main-color);
+	border-bottom: 1px solid var(--pw-border-color);
+	background: var(--pw-main-background);
+}
+.showcase-html-fixture #top > main > section > header h1 {
+	margin: 0;
+}
+.showcase-html-fixture #top > main > section > article > header {
+	margin: 36px 0 18px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid var(--pw-border-color);
+}
+.showcase-html-fixture #top > main > section > article > header h2 {
+	margin: 0;
+	color: var(--pw-main-color);
+	font-weight: 600;
+}
+</style><div class="pw-wrap showcase-html-fixture">' . $body . '</div>
+<script>
+(() => {
+	const list = document.querySelector(".showcase-html-fixture #forms__checkbox ul");
+	if (!list) return;
+	for (const disabled of [false, true]) {
+		const item = document.createElement("li");
+		const label = document.createElement("label");
+		const checkbox = document.createElement("input");
+		checkbox.id = disabled ? "showcase-indeterminate-disabled" : "showcase-indeterminate-enabled";
+		if (document.getElementById(checkbox.id)) continue;
+		checkbox.type = "checkbox";
+		//checkbox.className = "uk-checkbox";
+		checkbox.disabled = disabled;
+		checkbox.indeterminate = true;
+		label.htmlFor = checkbox.id;
+		label.append(checkbox, disabled ? " Indeterminate (disabled)" : " Indeterminate (enabled)");
+		item.append(label);
+		list.append(item);
+	}
+})();
+</script>';
 	}
 
 	/* ---------------------------------------------------------------------
@@ -2706,7 +3141,7 @@ JS;
 				'</div>' .
 				'</div>' .
 				'<div class="uk-card-body">' .
-				'<p class="uk-margin-remove">' . htmlspecialchars($r['email']) . '</p>' .
+				'<p class="uk-margin-remove"><a href="mailto:' . htmlspecialchars($r['email']) . '">' . htmlspecialchars($r['email']) . '</a></p>' .
 				'<p class="uk-margin-small-top"><span class="uk-label ' . $badgeClass . '">' . $this->_(ucfirst($r['status'])) . '</span></p>' .
 				'</div>' .
 				'<div class="uk-card-footer">' .
@@ -2727,7 +3162,7 @@ JS;
 		$themed = [
 			['style' => 'uk-card-default',   'icon' => 'file-text-o', 'title' => $this->_('Document card'),    'body' => $this->_('A standard card for document-like content.'),    'cta' => $this->_('Read more')],
 			['style' => 'uk-card-primary',   'icon' => 'star',        'title' => $this->_('Primary card'),     'body' => $this->_('A primary-styled card for featured content.'),   'cta' => $this->_('Explore')],
-			['style' => 'uk-card-secondary', 'icon' => 'cog',         'title' => $this->_('Secondary card'),   'body' => $this->_('A secondary-styled card for tools or settings.'), 'cta' => $this->_('Configure')],
+			['style' => 'uk-card-secondary', 'icon' => 'cog',         'title' => $this->_('Secondary card'),   'body' => $this->_('A secondary-styled card for settings.'), 'cta' => $this->_('Configure')],
 			['style' => 'uk-card-default',   'icon' => 'users',       'title' => $this->_('Team card'),        'body' => $this->_('Manage team members and permissions.'),          'cta' => $this->_('Manage')],
 			['style' => 'uk-card-default',   'icon' => 'bar-chart',   'title' => $this->_('Analytics card'),   'body' => $this->_('View traffic and conversion statistics.'),       'cta' => $this->_('View report')],
 			['style' => 'uk-card-primary',   'icon' => 'bell',        'title' => $this->_('Notifications'),    'body' => $this->_('Review recent alerts and system messages.'),     'cta' => $this->_('View all')],
