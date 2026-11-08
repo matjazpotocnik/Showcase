@@ -48,6 +48,8 @@ parts of the ProcessWire admin interface.
 - **Repeaters** lets you add, remove and reorder rows.
 - **Tables, Lists and Cards** show common ways to present admin content.
 - **HTML elements** provides a broad set of standard elements for theme testing.
+- **UIkit components** provides the UIkit catalogue using the live admin theme,
+  with preview-only light/dark, inverse-context and RTL controls.
 - **PageList states** shows common page statuses and actions.
 - **Notices & dialogs** demonstrates messages, confirmations and modals.
 

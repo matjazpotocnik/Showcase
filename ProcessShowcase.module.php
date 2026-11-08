@@ -69,7 +69,7 @@ class ProcessShowcase extends Process implements ConfigurableModule
 		return [
 			'title' => 'Showcase',
 			'summary' => 'Boilerplate / reference module that showcases ProcessWire admin UI patterns.',
-			'version' => 2,
+			'version' => 3,
 			'author' => 'webmanufaktur, Matjaž Potočnik, AI',
 			'href' => 'https://github.com/matjazpotocnik/Showcase',
 			'icon' => 'flask',
@@ -115,6 +115,7 @@ class ProcessShowcase extends Process implements ConfigurableModule
 	 */
 	public function ___install()
 	{
+		parent::___install();
 		$this->ensureNativeRepeaterFixture();
 		$this->ensureNativeMediaFixture();
 		$this->ensureSelectionFixtures();
@@ -128,6 +129,7 @@ class ProcessShowcase extends Process implements ConfigurableModule
 	 */
 	public function ___uninstall()
 	{
+		parent::___uninstall();
 		$this->removeSelectionFixture();
 		$this->removeNativeMediaFixture();
 		$this->removeCommentsFixture();
@@ -1898,78 +1900,104 @@ HTML;
 		$this->breadcrumb('../', $this->_('Showcase'));
 
 		$states = [
-			['class' => 'PageListHasChildren PageListItemOpen', 'icon' => 'home', 'title' => $this->_('Open page with children'), 'note' => $this->_('3 children'), 'count' => '3'],
-			['class' => 'PageListHasChildren', 'icon' => 'folder', 'title' => $this->_('Closed page with children'), 'note' => $this->_('12 children'), 'count' => '12'],
-			['class' => 'PageListNoChildren', 'icon' => 'file-o', 'title' => $this->_('Published leaf page'), 'note' => $this->_('Modified recently'), 'count' => ''],
-			['class' => 'PageListNoChildren PageListStatusHidden secondary', 'icon' => 'eye-slash', 'title' => $this->_('Hidden page'), 'note' => $this->_('Hidden from lists'), 'count' => ''],
-			['class' => 'PageListNoChildren PageListStatusUnpublished secondary', 'icon' => 'ban', 'title' => $this->_('Unpublished page'), 'note' => $this->_('Draft'), 'count' => ''],
-			['class' => 'PageListNoChildren PageListStatusLocked', 'icon' => 'lock', 'title' => $this->_('Locked page'), 'note' => $this->_('Editing restricted'), 'count' => ''],
+			['class' => 'PageListHasChildren PageListItemOpen', 'icon' => 'home', 'title' => $this->_('Open page with children'), 'note' => '', 'count' => '3'],
+			['class' => 'PageListHasChildren', 'icon' => 'folder', 'title' => $this->_('Closed page with children'), 'note' => '', 'count' => '12'],
+			['class' => 'PageListNoChildren PageListItemOpen', 'icon' => 'file-o', 'title' => $this->_('Page with a note'), 'note' => $this->_('Scheduled review: 15 November'), 'count' => ''],
+			['class' => 'PageListNoChildren', 'icon' => 'file-o', 'title' => $this->_('Published page without children'), 'note' => '', 'count' => ''],
+			['class' => 'PageListNoChildren PageListStatusHidden secondary', 'icon' => 'eye-slash', 'title' => $this->_('Hidden page'), 'note' => '', 'count' => ''],
+			['class' => 'PageListNoChildren PageListStatusUnpublished secondary', 'icon' => 'ban', 'title' => $this->_('Unpublished page'), 'note' => '', 'count' => ''],
+			['class' => 'PageListNoChildren PageListStatusLocked', 'icon' => '', 'statusIcon' => 'lock', 'title' => $this->_('Locked page'), 'note' => '', 'count' => ''],
+			['class' => 'PageListNoChildren PageListNotPublic PageListAccessOff', 'icon' => '', 'statusIcon' => 'key', 'title' => $this->_('Guests cannot view this page; they can view its parent'), 'note' => '', 'count' => ''],
+			['class' => 'PageListNoChildren PageListAccessOn', 'icon' => '', 'statusIcon' => 'key flip-horizontal', 'title' => $this->_('Guests can view this page; they cannot view its parent'), 'note' => '', 'count' => ''],
 		];
 
 		$out = '<p>' . $this->_('Examples of page states that are hard to reproduce in the live page tree.') . '</p>';
+		$out .= '<style>
+.ShowcasePageList .ShowcasePageListHovered {
+	background: var(--pw-blocks-background);
+}
+.ShowcasePageList .PageList .PageListItem.ShowcasePageListHovered .PageListActions.actions {
+	display: inline-block !important;
+	opacity: 1 !important;
+}
+.ShowcasePageList .PageList .PageListItem.ShowcasePageListLoading {
+	padding-left: 1.5em;
+}
+.ShowcasePageList .PageList .PageListItem.ShowcasePageListLoading > .PageListLoading {
+	left: 0;
+}
+</style>';
 
-		// Pagination specimen: markup mirrors what MarkupPagerNav actually emits, for a pager
-		// sitting on page 4 of 20, so every item type is represented (previous, first, plain
-		// numbers, current, separator, last, next).
-		//
-		// Container and item classes come from AdminThemeUikit/init.php:81-88, which keeps both
-		// the UIkit class and the module's own hook: listMarkup => 'uk-pagination MarkupPagerNav',
-		// currentItemClass => 'uk-active MarkupPagerNavOn', separatorItemClass => 'uk-disabled
-		// MarkupPagerNavSeparator'. The positional classes (First / Last / FirstNum / LastNum)
-		// are MarkupPagerNav's own defaults, applied by its render loop at :324-349.
-		//
-		// Two things this specimen deliberately does NOT imitate:
-		//  - ProcessPageList, whose own pager is ul.PageListPagination. It hardcodes
-		//    'paginationClass' => 'PageListPagination' (ProcessPageList.module:333) and never
-		//    reads it from config, so the init.php:90-98 block setting paginationClass =>
-		//    'uk-pagination' is dead config. Only .MarkupPagerNav gets the uk-pagination class,
-		//    added at runtime by scripts/main.js:549.
-		//  - Calling MarkupPagerNav itself, which would emit true output but also inject
-		//    <link rel="next"> / <link rel="prev"> into this page's head via
-		//    updateConfigVars() (MarkupPagerNav.module:679) -- wrong links for this page.
-		$pagerItems = array(
-			array('label' => wireIconMarkup('angle-left'), 'href' => '?page=3', 'type' => 'previous', 'class' => 'MarkupPagerNavPrevious MarkupPagerNavFirst', 'aria' => 'Previous page'),
-			array('label' => '1', 'href' => '?page=1', 'type' => 'number', 'class' => 'MarkupPagerNavFirstNum', 'aria' => 'Page 1'),
-			array('label' => '2', 'href' => '?page=2', 'type' => 'number', 'class' => '', 'aria' => 'Page 2'),
-			array('label' => '3', 'href' => '?page=3', 'type' => 'number', 'class' => '', 'aria' => 'Page 3'),
-			array('label' => '4', 'href' => '?page=4', 'type' => 'current', 'class' => 'uk-active MarkupPagerNavOn', 'aria' => 'Page 4, current page'),
-			array('label' => '5', 'href' => '?page=5', 'type' => 'number', 'class' => '', 'aria' => 'Page 5'),
-			array('label' => '<span>&hellip;</span>', 'href' => '', 'type' => 'separator', 'class' => 'uk-disabled MarkupPagerNavSeparator', 'aria' => ''),
-			array('label' => '20', 'href' => '?page=20', 'type' => 'last', 'class' => 'MarkupPagerNavLastNum', 'aria' => 'Page 20, last page'),
-			array('label' => wireIconMarkup('angle-right'), 'href' => '?page=5', 'type' => 'next', 'class' => 'MarkupPagerNavNext MarkupPagerNavLast', 'aria' => 'Next page'),
-		);
-
-		$pagerMarkup = '<ul class="uk-pagination MarkupPagerNav">';
-		foreach($pagerItems as $pagerItem) {
-			$pagerItemAttr = $pagerItem['type'] === 'current' ? " aria-current='true'" : '';
-			$pagerItemClass = $pagerItem['class'] !== '' ? " class='" . $pagerItem['class'] . "'" : '';
-			if($pagerItem['href'] !== '') {
-				$pagerItemOut = "<a href='" . $pagerItem['href'] . "'><span>" . $pagerItem['label'] . '</span></a>';
+		$pagination = array_merge([
+			'paginationClass' => 'PageListPagination',
+			'paginationCurrentClass' => 'PageListPaginationCurrent',
+			'paginationLinkClass' => 'ui-state-default',
+			'paginationLinkCurrentClass' => 'ui-state-active',
+			'paginationDisabledClass' => 'ui-priority-secondary',
+			'iconLeft' => "<i class='fa fa-angle-left'></i>",
+			'iconRight' => "<i class='fa fa-angle-right'></i>",
+		], (array) $this->config->ProcessPageList);
+		$entities = $this->sanitizer;
+		$paginationClass = $entities->entities($pagination['paginationClass']);
+		$pagerMarkup = '<ul class="' . $paginationClass . '">';
+		$pageListItems = [['index' => 0, 'page' => 2, 'label' => $pagination['iconLeft']]];
+		foreach(range(0, 9) as $pageIndex) {
+			$pageListItems[] = ['index' => $pageIndex, 'page' => $pageIndex, 'label' => (string) ($pageIndex + 1)];
+		}
+		$pageListItems[] = ['index' => 0, 'page' => null, 'label' => '&hellip;'];
+		$pageListItems[] = ['index' => 0, 'page' => 19, 'label' => '20'];
+		$pageListItems[] = ['index' => 0, 'page' => 4, 'label' => $pagination['iconRight']];
+		foreach($pageListItems as $item) {
+			$current = $item['page'] === 3;
+			$itemClass = $pagination['paginationClass'] . $item['index'];
+			if($current) $itemClass .= ' ' . $pagination['paginationCurrentClass'];
+			if($item['page'] === null) $itemClass .= ' ' . $pagination['paginationDisabledClass'];
+			$pagerMarkup .= '<li class="' . $entities->entities($itemClass) . '">';
+			if($item['page'] === null) {
+				$pagerMarkup .= $item['label'];
 			} else {
-				$pagerItemOut = $pagerItem['label'];
+				$linkClass = $pagination[$current ? 'paginationLinkCurrentClass' : 'paginationLinkClass'];
+				$pagerMarkup .= '<a href="' . $item['page'] . '" class="' . $entities->entities($linkClass) . '">' . $item['label'] . '</a>';
 			}
-			$pagerMarkup .= '<li aria-label="' . $pagerItem['aria'] . '"' . $pagerItemClass . $pagerItemAttr . '>' . $pagerItemOut . '</li>';
+			$pagerMarkup .= '</li>';
 		}
 		$pagerMarkup .= '</ul>';
 
-		$out .= '<div class="PageListRoot"><div class="PageList">';
+		$out .= '<div class="ShowcasePageList PageListRoot" onclick="event.preventDefault();"><div class="PageList">';
 		foreach ($states as $index => $state) {
 			$out .= '<div class="PageListItem PageListID' . (9000 + $index) . ' ' . $state['class'] . '">';
-			$out .= '<a class="PageListPage label" href="#"><i class="icon fa fa-' . $state['icon'] . '"></i><span>' . htmlspecialchars($state['title']) . '</span></a>';
+			$out .= '<a class="PageListPage label" href="#">';
+			if ($state['icon'] !== '') $out .= '<i class="icon fa fa-' . $state['icon'] . '"></i>';
+			$out .= '<span>' . htmlspecialchars($state['title']) . '</span>';
+			if (!empty($state['statusIcon'])) $out .= wireIconMarkup($state['statusIcon'] . ' fw PageListStatusIcon');
+			$out .= '</a>';
 			if ($state['count'] !== '') $out .= '<span class="PageListNumChildren">' . $state['count'] . '</span>';
-			$out .= '<span class="PageListNote detail">' . htmlspecialchars($state['note']) . '</span>';
+			if ($state['note'] !== '') $out .= '<span class="PageListNote detail">' . htmlspecialchars($state['note']) . '</span>';
 			$out .= '<ul class="PageListActions actions">';
 			$out .= '<li class="PageListActionEdit"><a href="#">' . $this->_('Edit') . '</a></li>';
 			$out .= '<li class="PageListActionView"><a href="#">' . $this->_('View') . '</a></li>';
-			$out .= '<li class="PageListActionExtras"><a href="#">' . $this->_('More') . '</a></li>';
+			$out .= '<li class="PageListActionExtras"><a href="#"><i class="fa fa-angle-right"></i></a></li>';
 			$out .= '</ul>';
 			$out .= '</div>';
 			if ($index === 0) {
-				$out .= $pagerMarkup;
-				$out .= '<div class="PageList"><div class="PageListItem PageListNoChildren"><a class="PageListPage label" href="#"><i class="icon fa fa-file-o"></i><span>' . $this->_('Nested child page') . '</span></a></div></div>';
+				$out .= '<div class="PageList">' . $pagerMarkup;
+				foreach([false, true] as $expanded) {
+					$out .= '<div class="PageListItem PageListNoChildren PageListItemHover ShowcasePageListHovered"><a class="PageListPage label" href="#">' . ($expanded ? $this->_('Page with expanded actions') : $this->_('Page with visible actions')) . '</a><ul class="PageListActions actions">';
+					foreach(['Edit', 'View', 'New', 'Move'] as $action) {
+						$out .= '<li class="PageListAction' . $action . '"><a href="#">' . $this->_($action) . '</a></li>';
+					}
+					$out .= '<li class="PageListActionExtras"><a href="#"><i class="fa fa-angle-right' . ($expanded ? ' fa-flip-horizontal' : '') . '"></i></a></li>';
+					if($expanded) {
+						foreach(['Copy', 'Unpub', 'Hide', 'Lock', 'Delete', 'Trash'] as $action) {
+							$out .= '<li class="PageListActionExtra"><a class="PageListActionExtra PageListAction' . $action . '" href="#">' . ($action === 'Trash' ? '<i class="fa fa-trash-o"></i> ' : '') . $this->_($action) . '</a></li>';
+						}
+					}
+					$out .= '</ul></div>';
+				}
+				$out .= '</div>';
 			}
 		}
-		$out .= '<div class="PageListItem PageListHasChildren PageListItemOpen"><span class="PageListLoading"><i class="fa fa-spin fa-spinner"></i></span><a class="PageListPage label" href="#"><i class="icon fa fa-folder-open"></i><span>' . $this->_('Loading children') . '</span></a></div>';
+		$out .= '<div class="PageListItem PageListHasChildren PageListItemOpen ShowcasePageListLoading"><span class="PageListLoading"><i class="fa fa-spin fa-spinner"></i></span><a class="PageListPage label" href="#"><i class="icon fa fa-folder-open"></i><span>' . $this->_('Loading children') . '</span></a></div>';
 		$out .= '<div class="PageListPlaceholder"><div class="PageListPlaceholderItem PageListSortPlaceholder">' . $this->_('Drag-and-drop placeholder') . '</div></div>';
 		$out .= '</div></div>';
 
@@ -2029,7 +2057,7 @@ HTML;
 
 		$out = '<h2>' . $this->_('Server notices') . '</h2>';
 		$out .= '<p>' . $this->_('Each action reloads this page through the normal Process notice lifecycle.') . '</p>';
-		$out .= '<div class="uk-button-group">';
+		$out .= '<div class="uk-flex uk-flex-wrap">';
 		$out .= '<a class="ui-button ui-state-default" href="?notice=message"><i class="fa fa-check"></i> ' . $this->_('Message') . '</a>';
 		$out .= '<a class="ui-button ui-state-default" href="?notice=warning"><i class="fa fa-exclamation-triangle"></i> ' . $this->_('Warning') . '</a>';
 		$out .= '<a class="ui-button ui-state-default" href="?notice=error"><i class="fa fa-times-circle"></i> ' . $this->_('Error') . '</a>';
@@ -2037,14 +2065,14 @@ HTML;
 		$out .= '</div>';
 
 		$out .= '<h2 class="uk-margin-large-top">' . $this->_('Dialogs') . '</h2>';
-		$out .= '<div class="uk-button-group">';
+		$out .= '<div class="uk-flex uk-flex-wrap">';
 		$out .= '<button type="button" id="ShowcaseAlert" class="ui-button ui-state-default"><i class="fa fa-info-circle"></i> ' . $this->_('Alert') . '</button>';
 		$out .= '<button type="button" id="ShowcaseConfirm" class="ui-button ui-state-default"><i class="fa fa-question-circle"></i> ' . $this->_('Confirm') . '</button>';
 		$out .= '<button type="button" id="ShowcaseInlineModal" class="ui-button ui-state-default"><i class="fa fa-window-maximize"></i> ' . $this->_('Inline modal') . '</button>';
 		$out .= '<a class="ui-button ui-state-default pw-modal pw-modal-medium" href="../cards/?modal=1"><i class="fa fa-window-maximize"></i> ' . $this->_('Iframe modal') . '</a>';
 		$out .= '</div>';
 		$out .= '<h2 class="uk-margin-large-top">' . $this->_('Vex dialogs') . '</h2>';
-		$out .= '<div class="uk-button-group">';
+		$out .= '<div class="uk-flex uk-flex-wrap">';
 		$out .= '<button type="button" id="ShowcaseVexAlert" class="ui-button ui-state-default"><i class="fa fa-info-circle"></i> ' . $this->_('Alert') . '</button>';
 		$out .= '<button type="button" id="ShowcaseVexConfirm" class="ui-button ui-state-default"><i class="fa fa-question-circle"></i> ' . $this->_('Confirm') . '</button>';
 		$out .= '<button type="button" id="ShowcaseVexPrompt" class="ui-button ui-state-default"><i class="fa fa-pencil"></i> ' . $this->_('Prompt') . '</button>';
